@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS inspection_record (
     area            VARCHAR(200)    NOT NULL                COMMENT '巡检区域',
     inspection_time DATETIME        NOT NULL                COMMENT '巡检时间（业务时间）',
     device_name     VARCHAR(200)    NOT NULL                COMMENT '设备名称',
-    result          TINYINT         NOT NULL                COMMENT '巡检结果（0=正常, 1=异常）',
+    result          TINYINT         NOT NULL                COMMENT '巡检结果（0=正常, 1=故障, 2=隐患）',
     description     TEXT            NULL                    COMMENT '详细描述',
     created_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP           COMMENT '记录创建时间',
     updated_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录更新时间',

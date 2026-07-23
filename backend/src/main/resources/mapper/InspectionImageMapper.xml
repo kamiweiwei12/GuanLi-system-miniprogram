@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspection.mapper.InspectionImageMapper">
+
+    <resultMap id="BaseResultMap" type="com.inspection.entity.InspectionImage">
+        <id column="id" property="id"/>
+        <result column="record_id" property="recordId"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.inspection.entity.InspectionImage"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO inspection_image (record_id, image_url)
+        VALUES (#{recordId}, #{imageUrl})
+    </insert>
+
+    <select id="selectByRecordId" resultMap="BaseResultMap">
+        SELECT * FROM inspection_image
+        WHERE record_id = #{recordId}
+        ORDER BY created_at ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspection.mapper.InspectionRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.inspection.entity.InspectionRecord">
+        <id column="id" property="id"/>
+        <result column="department" property="department"/>
+        <result column="employee_name" property="employeeName"/>
+        <result column="phone_number" property="phoneNumber"/>
+        <result column="area" property="area"/>
+        <result column="inspection_time" property="inspectionTime"/>
+        <result column="device_name" property="deviceName"/>
+        <result column="result" property="result" javaType="Integer"/>
+        <result column="description" property="description"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.inspection.entity.InspectionRecord"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO inspection_record (
+            department, employee_name, phone_number, area,
+            inspection_time, device_name, result, description
+        ) VALUES (
+            #{department}, #{employeeName}, #{phoneNumber}, #{area},
+            #{inspectionTime}, #{deviceName}, #{result}, #{description}
+        )
+        <!-- result: 0=正常, 1=故障, 2=隐患 -->
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM inspection_record
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT * FROM inspection_record
+        WHERE is_deleted = 0
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="update" parameterType="com.inspection.entity.InspectionRecord">
+        UPDATE inspection_record
+        <set>
+            <if test="department != null">department = #{department},</if>
+            <if test="employeeName != null">employee_name = #{employeeName},</if>
+            <if test="phoneNumber != null">phone_number = #{phoneNumber},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="inspectionTime != null">inspection_time = #{inspectionTime},</if>
+            <if test="deviceName != null">device_name = #{deviceName},</if>
+            <if test="result != null">result = #{result},</if>
+            <if test="description != null">description = #{description},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE inspection_record
+        SET is_deleted = 1
+        WHERE id = #{id}
+    </update>
+
+</mapper>

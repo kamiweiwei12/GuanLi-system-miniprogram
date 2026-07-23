@@ -144,11 +144,11 @@ chore: 项目初始化（目录结构 + Git 仓库 + .gitignore）
 
 | 阶段 | 内容 | 状态 |
 |---|---|---|
-| 第一阶段 | 项目初始化（目录结构、Git、.gitignore、README、docs） | 🚧 进行中 |
-| 第二阶段 | 数据库设计（业务分析 → 表设计 → init.sql） | ⬜ 待开始 |
-| 第三阶段 | Spring Boot 初始化（项目骨架、多环境配置、健康检查） | ⬜ 待开始 |
-| 第四阶段 | 基础框架（统一返回、异常处理、日志） | ⬜ 待开始 |
-| 第五阶段 | 巡检业务（Entity → DTO → Mapper → Service → Controller） | ⬜ 待开始 |
+| 第一阶段 | 项目初始化（目录结构、Git、.gitignore、README、docs） | ✅ 已完成 |
+| 第二阶段 | 数据库设计（业务分析 → 表设计 → init.sql） | ✅ 已完成 |
+| 第三阶段 | Spring Boot 初始化（项目骨架、多环境配置、启动验证） | ✅ 已完成 |
+| 第四阶段 | 基础业务开发（Entity → Mapper → Service → Controller） | 🟡 进行中 |
+| 第五阶段 | 查询接口（分页、筛选：日期/区域/部门/设备） | ⬜ 待开始 |
 | 第六阶段 | 查询接口（分页、筛选：日期/区域/部门/设备） | ⬜ 待开始 |
 | 第七阶段 | 微信小程序（巡检表单、图片上传、提交） | ⬜ 待开始 |
 | 第八阶段 | Vue3 管理后台（列表、分页、筛选、统计图） | ⬜ 待开始 |
@@ -159,15 +159,17 @@ chore: 项目初始化（目录结构 + Git 仓库 + .gitignore）
 
 ## 项目状态（Project Status）
 
-**当前阶段**：第一阶段 — 项目初始化
+**当前阶段**：第四阶段 — 基础业务开发
 
 | 步骤 | 内容 | 状态 |
 |---|---|---|
-| Step 1 | 创建项目目录结构 | ✅ 已完成 |
-| Step 2 | 初始化 Git 仓库 | ✅ 已完成 |
-| Step 3 | 创建 .gitignore | ✅ 已完成 |
-| Step 4 | 创建 README.md | ✅ 已完成 |
-| Step 5 | 创建 docs/ 文档骨架 | ✅ 已完成 |
+| Step 1-5 | 项目初始化 + 文档骨架 | ✅ 已完成 |
+| Step 6-8 | 数据库设计 + init.sql | ✅ 已完成 |
+| Step 9-10 | Spring Boot 骨架 + 包结构 + 配置 + 启动验证 | ✅ 已完成 |
+| Step 11 | 创建 Entity + Mapper（XML） | ✅ 已完成 |
+| Step 12 | 创建 Service + DTO + BusinessException | ✅ 已完成 |
+| Step 13 | 创建 Controller + Result + GlobalExceptionHandler | ✅ 已完成 |
+| Step 14 | 查询接口（GET /report + 分页） | 🟡 进行中 |
 
 ---
 
