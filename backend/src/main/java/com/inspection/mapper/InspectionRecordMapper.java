@@ -1,5 +1,6 @@
 package com.inspection.mapper;
 
+import com.inspection.dto.InspectionQueryDTO;
 import com.inspection.entity.InspectionRecord;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -16,6 +17,16 @@ public interface InspectionRecordMapper {
     InspectionRecord selectById(Long id);
 
     List<InspectionRecord> selectList();
+
+    /**
+     * 条件查询
+     */
+    List<InspectionRecord> selectByCondition(InspectionQueryDTO dto);
+
+    /**
+     * 条件计数
+     */
+    long count(InspectionQueryDTO dto);
 
     int update(InspectionRecord record);
 

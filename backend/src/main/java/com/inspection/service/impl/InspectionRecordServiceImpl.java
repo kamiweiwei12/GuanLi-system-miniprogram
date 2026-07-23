@@ -1,5 +1,7 @@
 package com.inspection.service.impl;
 
+import com.inspection.common.PageResult;
+import com.inspection.dto.InspectionQueryDTO;
 import com.inspection.dto.InspectionReportDTO;
 import com.inspection.entity.InspectionImage;
 import com.inspection.entity.InspectionRecord;
@@ -7,10 +9,13 @@ import com.inspection.exception.BusinessException;
 import com.inspection.mapper.InspectionImageMapper;
 import com.inspection.mapper.InspectionRecordMapper;
 import com.inspection.service.InspectionRecordService;
+import com.inspection.vo.InspectionRecordVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 巡检记录服务实现
@@ -66,6 +71,61 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
             throw new BusinessException(404, "巡检记录不存在: id=" + id);
         }
         return record;
+    }
+
+    @Override
+    public PageResult<InspectionRecordVO> queryList(InspectionQueryDTO dto) {
+        // 参数校验
+        if (dto.getPageNum() == null || dto.getPageNum() < 1) {
+            dto.setPageNum(1);
+        }
+        if (dto.getPageSize() == null || dto.getPageSize() < 1) {
+            dto.setPageSize(10);
+        }
+        if (dto.getPageSize() > 100) {
+            dto.setPageSize(100);
+        }
+
+        // 查询数据
+        List<InspectionRecord> records = recordMapper.selectByCondition(dto);
+        long total = recordMapper.count(dto);
+
+        // Entity → VO（逐条查询关联图片）
+        List<InspectionRecordVO> voList = records.stream()
+                .map(this::toVO)
+                .collect(Collectors.toList());
+
+        return new PageResult<>(voList, total, dto.getPageNum(), dto.getPageSize());
+    }
+
+    /**
+     * Entity → VO 转换
+     */
+    private InspectionRecordVO toVO(InspectionRecord record) {
+        InspectionRecordVO vo = new InspectionRecordVO();
+        vo.setId(record.getId());
+        vo.setDepartment(record.getDepartment());
+        vo.setEmployeeName(record.getEmployeeName());
+        vo.setPhoneNumber(record.getPhoneNumber());
+        vo.setArea(record.getArea());
+        vo.setInspectionTime(record.getInspectionTime());
+        vo.setDeviceName(record.getDeviceName());
+        vo.setResult(record.getResult());
+        vo.setDescription(record.getDescription());
+        vo.setCreatedAt(record.getCreatedAt());
+
+        // 查询关联图片（N+1 优化空间）
+        List<InspectionImage> images = imageMapper.selectByRecordId(record.getId());
+        if (images != null && !images.isEmpty()) {
+            List<String> imageUrls = images.stream()
+                    .map(InspectionImage::getImageUrl)
+                    .collect(Collectors.toList());
+            vo.setImageUrls(imageUrls);
+        } else {
+            vo.setImageUrls(new ArrayList<>());
+        }
+
+        return vo;
     }
 
     /**

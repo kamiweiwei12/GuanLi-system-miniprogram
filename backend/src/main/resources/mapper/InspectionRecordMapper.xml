@@ -63,4 +63,48 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 条件查询（分页） -->
+    <select id="selectByCondition" parameterType="com.inspection.dto.InspectionQueryDTO" resultMap="BaseResultMap">
+        SELECT * FROM inspection_record
+        WHERE is_deleted = 0
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="result != null">
+            AND result = #{result}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name LIKE CONCAT('%', #{deviceName}, '%')
+        </if>
+        <if test="startTime != null">
+            AND inspection_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND inspection_time &lt;= #{endTime}
+        </if>
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 条件计数 -->
+    <select id="count" parameterType="com.inspection.dto.InspectionQueryDTO" resultType="long">
+        SELECT COUNT(*) FROM inspection_record
+        WHERE is_deleted = 0
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="result != null">
+            AND result = #{result}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name LIKE CONCAT('%', #{deviceName}, '%')
+        </if>
+        <if test="startTime != null">
+            AND inspection_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND inspection_time &lt;= #{endTime}
+        </if>
+    </select>
+
 </mapper>
