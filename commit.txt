@@ -1,8 +1,0 @@
-feat(user): add user base module (Phase 6)
-
-- Add User, Role, Department entities
-- Add UserMapper + XML
-- Add RoleMapper + XML
-- Add UserService + Impl
-- Reserve authentication for Phase 7
-- Build success
