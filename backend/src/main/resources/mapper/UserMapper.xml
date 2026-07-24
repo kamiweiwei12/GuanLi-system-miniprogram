@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.inspection.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.inspection.entity.User">
+        <id column="id" property="id"/>
+        <result column="openid" property="openid"/>
+        <result column="username" property="username"/>
+        <result column="phone" property="phone"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="role_id" property="roleId"/>
+        <result column="status" property="status"/>
+        <result column="nickname" property="nickname"/>
+        <result column="avatar_url" property="avatarUrl"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.inspection.entity.User"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_user (
+            openid, username, phone, department_id, role_id,
+            status, nickname, avatar_url
+        ) VALUES (
+            #{openid}, #{username}, #{phone}, #{departmentId}, #{roleId},
+            #{status}, #{nickname}, #{avatarUrl}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM sys_user
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <select id="selectByOpenid" resultMap="BaseResultMap">
+        SELECT * FROM sys_user
+        WHERE openid = #{openid} AND is_deleted = 0
+    </select>
+
+    <update id="update" parameterType="com.inspection.entity.User">
+        UPDATE sys_user
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="departmentId != null">department_id = #{departmentId},</if>
+            <if test="roleId != null">role_id = #{roleId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="avatarUrl != null">avatar_url = #{avatarUrl},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>
