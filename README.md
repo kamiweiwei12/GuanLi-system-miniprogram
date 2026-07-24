@@ -169,7 +169,10 @@ chore: 项目初始化（目录结构 + Git 仓库 + .gitignore）
 | Step 11 | 创建 Entity + Mapper（XML） | ✅ 已完成 |
 | Step 12 | 创建 Service + DTO + BusinessException | ✅ 已完成 |
 | Step 13 | 创建 Controller + Result + GlobalExceptionHandler | ✅ 已完成 |
-| Step 14 | 查询接口（GET /report + 分页） | 🟡 进行中 |
+| Step 14 | 查询接口（GET /report + 分页 + 筛选） | ✅ 已完成 |
+| Step 15 | 图片上传接口（POST /upload/image） | ✅ 已完成 |
+| Step 16 | 微信小程序基础工程（环境配置 + 请求封装 + API模块） | ✅ 已完成 |
+| Step 17 | 微信小程序巡检上报页面 | 🟡 进行中 |
 
 ---
 

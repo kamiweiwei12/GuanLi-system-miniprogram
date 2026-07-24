@@ -1,8 +1,9 @@
 // index.ts
 // 获取应用实例
+
 const app = getApp<IAppOption>()
 const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
-
+import { queryReport } from '../../api/report'
 Component({
   data: {
     motto: 'Hello World',
@@ -50,5 +51,21 @@ Component({
         }
       })
     },
+  },
+  lifetimes: {
+    attached() {
+      console.log('开始测试接口');
+  
+      queryReport({
+        pageNum: 1,
+        pageSize: 10
+      })
+        .then(res => {
+          console.log('接口成功：', res);
+        })
+        .catch(err => {
+          console.error('接口失败：', err);
+        });
+    }
   },
 })
