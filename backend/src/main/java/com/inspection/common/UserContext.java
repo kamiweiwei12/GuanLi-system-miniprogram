@@ -6,17 +6,47 @@ package com.inspection.common;
  */
 public class UserContext {
 
-    private static final ThreadLocal<Long> USER_ID_HOLDER = new ThreadLocal<>();
+    private static final ThreadLocal<UserInfo> USER_HOLDER = new ThreadLocal<>();
 
-    public static void setUserId(Long userId) {
-        USER_ID_HOLDER.set(userId);
+    public static void setUser(Long userId, Long roleId, String roleCode) {
+        USER_HOLDER.set(new UserInfo(userId, roleId, roleCode));
     }
 
     public static Long getUserId() {
-        return USER_ID_HOLDER.get();
+        UserInfo info = USER_HOLDER.get();
+        return info != null ? info.userId : null;
+    }
+
+    public static Long getRoleId() {
+        UserInfo info = USER_HOLDER.get();
+        return info != null ? info.roleId : null;
+    }
+
+    public static String getRoleCode() {
+        UserInfo info = USER_HOLDER.get();
+        return info != null ? info.roleCode : null;
+    }
+
+    public static boolean isAdmin() {
+        return "ADMIN".equals(getRoleCode());
     }
 
     public static void clear() {
-        USER_ID_HOLDER.remove();
+        USER_HOLDER.remove();
+    }
+
+    /**
+     * 用户简要信息
+     */
+    public static class UserInfo {
+        private final Long userId;
+        private final Long roleId;
+        private final String roleCode;
+
+        UserInfo(Long userId, Long roleId, String roleCode) {
+            this.userId = userId;
+            this.roleId = roleId;
+            this.roleCode = roleCode;
+        }
     }
 }

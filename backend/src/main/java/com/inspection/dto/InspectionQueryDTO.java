@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
  */
 public class InspectionQueryDTO {
 
+    private Long userId;
     private Integer pageNum = 1;
     private Integer pageSize = 10;
     private String area;
@@ -14,6 +15,14 @@ public class InspectionQueryDTO {
     private String deviceName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
     public Integer getPageNum() {
         return pageNum;

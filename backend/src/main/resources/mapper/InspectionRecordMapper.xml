@@ -6,6 +6,7 @@
 
     <resultMap id="BaseResultMap" type="com.inspection.entity.InspectionRecord">
         <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
         <result column="department" property="department"/>
         <result column="employee_name" property="employeeName"/>
         <result column="phone_number" property="phoneNumber"/>
@@ -22,10 +23,10 @@
     <insert id="insert" parameterType="com.inspection.entity.InspectionRecord"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO inspection_record (
-            department, employee_name, phone_number, area,
+            user_id, department, employee_name, phone_number, area,
             inspection_time, device_name, result, description
         ) VALUES (
-            #{department}, #{employeeName}, #{phoneNumber}, #{area},
+            #{userId}, #{department}, #{employeeName}, #{phoneNumber}, #{area},
             #{inspectionTime}, #{deviceName}, #{result}, #{description}
         )
         <!-- result: 0=正常, 1=故障, 2=隐患 -->
@@ -67,6 +68,9 @@
     <select id="selectByCondition" parameterType="com.inspection.dto.InspectionQueryDTO" resultMap="BaseResultMap">
         SELECT * FROM inspection_record
         WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
         <if test="area != null and area != ''">
             AND area = #{area}
         </if>
@@ -90,6 +94,9 @@
     <select id="count" parameterType="com.inspection.dto.InspectionQueryDTO" resultType="long">
         SELECT COUNT(*) FROM inspection_record
         WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
         <if test="area != null and area != ''">
             AND area = #{area}
         </if>

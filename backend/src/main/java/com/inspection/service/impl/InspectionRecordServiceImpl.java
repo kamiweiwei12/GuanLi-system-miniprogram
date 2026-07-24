@@ -8,6 +8,7 @@ import com.inspection.entity.InspectionRecord;
 import com.inspection.exception.BusinessException;
 import com.inspection.mapper.InspectionImageMapper;
 import com.inspection.mapper.InspectionRecordMapper;
+import com.inspection.common.UserContext;
 import com.inspection.service.InspectionRecordService;
 import com.inspection.vo.InspectionRecordVO;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +49,14 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
         // 2. DTO 转 Entity
         InspectionRecord record = toEntity(dto);
 
-        // 3. 插入巡检记录
+        // 3. 从认证上下文获取当前用户
+        Long userId = UserContext.getUserId();
+        if (userId == null) {
+            throw new BusinessException(401, "未认证");
+        }
+        record.setUserId(userId);
+
+        // 4. 插入巡检记录
         recordMapper.insert(record);
         Long recordId = record.getId();
 
@@ -88,6 +96,11 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
 
     @Override
     public PageResult<InspectionRecordVO> queryList(InspectionQueryDTO dto) {
+        // 权限过滤：非 ADMIN 角色只查自己的数据
+        if (UserContext.getUserId() != null && !UserContext.isAdmin()) {
+            dto.setUserId(UserContext.getUserId());
+        }
+
         // 参数校验
         if (dto.getPageNum() == null || dto.getPageNum() < 1) {
             dto.setPageNum(1);

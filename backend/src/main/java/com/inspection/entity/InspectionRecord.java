@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class InspectionRecord {
 
     private Long id;
+    private Long userId;
     private String department;
     private String employeeName;
     private String phoneNumber;
@@ -26,6 +27,14 @@ public class InspectionRecord {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getDepartment() {
