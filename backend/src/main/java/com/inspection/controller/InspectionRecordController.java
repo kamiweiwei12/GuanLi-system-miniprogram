@@ -40,18 +40,7 @@ public class InspectionRecordController {
 
     @GetMapping("/report/{id}")
     public Result<InspectionRecordVO> getById(@PathVariable Long id) {
-        var record = service.getById(id);
-        InspectionRecordVO vo = new InspectionRecordVO();
-        vo.setId(record.getId());
-        vo.setDepartment(record.getDepartment());
-        vo.setEmployeeName(record.getEmployeeName());
-        vo.setPhoneNumber(record.getPhoneNumber());
-        vo.setArea(record.getArea());
-        vo.setInspectionTime(record.getInspectionTime());
-        vo.setDeviceName(record.getDeviceName());
-        vo.setResult(record.getResult());
-        vo.setDescription(record.getDescription());
-        vo.setCreatedAt(record.getCreatedAt());
+        InspectionRecordVO vo = service.getByIdVO(id);
         return Result.success(vo);
     }
 }

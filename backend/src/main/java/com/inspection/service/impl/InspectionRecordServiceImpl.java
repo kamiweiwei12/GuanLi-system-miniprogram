@@ -10,6 +10,7 @@ import com.inspection.mapper.InspectionImageMapper;
 import com.inspection.mapper.InspectionRecordMapper;
 import com.inspection.service.InspectionRecordService;
 import com.inspection.vo.InspectionRecordVO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +27,14 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
     private final InspectionRecordMapper recordMapper;
     private final InspectionImageMapper imageMapper;
 
+    @Value("${file.base-url}")
+    private String fileBaseUrl;
+
     /**
      * 构造器注入
      */
     public InspectionRecordServiceImpl(InspectionRecordMapper recordMapper,
-                                       InspectionImageMapper imageMapper) {
+                                        InspectionImageMapper imageMapper) {
         this.recordMapper = recordMapper;
         this.imageMapper = imageMapper;
     }
@@ -74,6 +78,15 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
     }
 
     @Override
+    public InspectionRecordVO getByIdVO(Long id) {
+        InspectionRecord record = recordMapper.selectById(id);
+        if (record == null) {
+            throw new BusinessException(404, "巡检记录不存在: id=" + id);
+        }
+        return toVO(record);
+    }
+
+    @Override
     public PageResult<InspectionRecordVO> queryList(InspectionQueryDTO dto) {
         // 参数校验
         if (dto.getPageNum() == null || dto.getPageNum() < 1) {
@@ -114,11 +127,11 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
         vo.setDescription(record.getDescription());
         vo.setCreatedAt(record.getCreatedAt());
 
-        // 查询关联图片（N+1 优化空间）
+        // 查询关联图片，拼接完整访问 URL（数据库存相对路径 /uploads/xxx，返回完整 HTTP URL）
         List<InspectionImage> images = imageMapper.selectByRecordId(record.getId());
         if (images != null && !images.isEmpty()) {
             List<String> imageUrls = images.stream()
-                    .map(InspectionImage::getImageUrl)
+                    .map(img -> fileBaseUrl + img.getImageUrl())
                     .collect(Collectors.toList());
             vo.setImageUrls(imageUrls);
         } else {

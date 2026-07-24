@@ -17,9 +17,14 @@ public interface InspectionRecordService {
     Long submitReport(InspectionReportDTO dto);
 
     /**
-     * 按 ID 查询巡检记录
+     * 按 ID 查询巡检记录（Entity）
      */
     InspectionRecord getById(Long id);
+
+    /**
+     * 按 ID 查询巡检记录（VO，含图片）
+     */
+    InspectionRecordVO getByIdVO(Long id);
 
     /**
      * 分页条件查询巡检记录

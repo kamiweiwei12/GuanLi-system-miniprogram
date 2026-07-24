@@ -74,6 +74,7 @@ public class FileUploadServiceImpl implements FileUploadService {
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
             }
+            // TODO: 当前 /uploads/** 公开访问，未来企业版需结合权限控制
             log.info("文件上传成功：{}", targetFile);
         } catch (IOException e) {
             log.error("文件保存失败", e);

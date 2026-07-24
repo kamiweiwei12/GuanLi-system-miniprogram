@@ -17,8 +17,9 @@ mybatis:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
 file:
-  upload-path: ./uploads
+  upload-path: ${FILE_UPLOAD_PATH:./uploads}
   access-prefix: /uploads
+  base-url: ${FILE_BASE_URL:http://localhost:8080}
 
 logging:
   level:
