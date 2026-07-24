@@ -1,0 +1,76 @@
+-- 认证框架集成测试用（预置用户 + token）
+CREATE TABLE IF NOT EXISTS sys_role (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    role_name VARCHAR(50) NOT NULL,
+    role_code VARCHAR(30) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE INDEX idx_role_code (role_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT IGNORE INTO sys_role (role_name, role_code) VALUES
+    ('普通员工', 'EMPLOYEE'),
+    ('部门管理员', 'DEPT_ADMIN'),
+    ('系统管理员', 'ADMIN');
+
+CREATE TABLE IF NOT EXISTS sys_user (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    openid VARCHAR(64) NOT NULL,
+    username VARCHAR(50) NOT NULL,
+    phone VARCHAR(20) NULL,
+    department_id BIGINT NULL,
+    role_id BIGINT NOT NULL,
+    status TINYINT NOT NULL DEFAULT 1,
+    nickname VARCHAR(100) NULL,
+    avatar_url VARCHAR(500) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (id),
+    UNIQUE INDEX idx_user_openid (openid)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS inspection_record (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    user_id BIGINT NOT NULL DEFAULT 0,
+    department VARCHAR(100) NOT NULL,
+    employee_name VARCHAR(50) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    area VARCHAR(200) NOT NULL,
+    inspection_time DATETIME NOT NULL,
+    device_name VARCHAR(200) NOT NULL,
+    result TINYINT NOT NULL,
+    description TEXT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS inspection_image (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    record_id BIGINT NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS sys_token (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    token VARCHAR(64) NOT NULL,
+    expire_time DATETIME NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE INDEX idx_token_value (token),
+    INDEX idx_token_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 预置测试用户（openid 固定）
+INSERT INTO sys_user (openid, username, role_id) VALUES ('auth_test_openid', 'AuthTest', 1)
+    ON DUPLICATE KEY UPDATE username = username;
+
+-- 预置有效 token（user_id 通过子查询关联）
+INSERT IGNORE INTO sys_token (user_id, token, expire_time)
+SELECT id, 'test-token-valid', DATE_ADD(NOW(), INTERVAL 7 DAY)
+FROM sys_user WHERE openid = 'auth_test_openid';
