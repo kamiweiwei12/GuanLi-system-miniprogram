@@ -1,0 +1,68 @@
+<!-- pages/detail/detail.wxml -->
+<view class="container">
+  <!-- Loading -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- Error -->
+  <view class="error" wx:elif="{{error}}">
+    <text class="error-text">加载失败，请返回重试</text>
+  </view>
+
+  <!-- Detail -->
+  <view class="content" wx:elif="{{detail}}">
+    <view class="card">
+      <view class="card-header">
+        <text class="name">{{detail.employeeName}}</text>
+        <text class="tag {{resultClass}}">{{resultText}}</text>
+      </view>
+
+      <view class="info-grid">
+        <view class="info-item">
+          <text class="info-label">部门</text>
+          <text class="info-value">{{detail.department}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">手机号</text>
+          <text class="info-value">{{detail.phoneNumber}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">区域</text>
+          <text class="info-value">{{detail.area}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">巡检时间</text>
+          <text class="info-value">{{detail.inspectionTime}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">设备名称</text>
+          <text class="info-value">{{detail.deviceName}}</text>
+        </view>
+        <view class="info-item full-width">
+          <text class="info-label">详细描述</text>
+          <text class="info-value description">{{detail.description || '暂无描述'}}</text>
+        </view>
+      </view>
+
+      <!-- Images -->
+      <view class="image-section">
+        <text class="section-title">现场照片</text>
+        <view class="image-grid" wx:if="{{detail.imageUrls.length > 0}}">
+          <image
+            wx:for="{{detail.imageUrls}}"
+            wx:key="*this"
+            src="{{item}}"
+            mode="aspectFill"
+            class="preview-image"
+            bindtap="previewImage"
+            data-index="{{index}}"
+          />
+        </view>
+        <view class="no-images" wx:else>
+          <text class="no-images-text">暂无图片</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
