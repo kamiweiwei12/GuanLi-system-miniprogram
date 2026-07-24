@@ -1,0 +1,90 @@
+/* pages/report/report.wxss */
+.container {
+    padding: 30rpx;
+}
+
+.form-group {
+    margin-bottom: 30rpx;
+}
+
+.label {
+    display: block;
+    font-size: 28rpx;
+    color: #333;
+    margin-bottom: 12rpx;
+    font-weight: 500;
+}
+
+.input,
+.picker,
+.textarea {
+    width: 100%;
+    min-height: 80rpx;
+    padding: 16rpx 20rpx;
+    border: 1rpx solid #ddd;
+    border-radius: 8rpx;
+    font-size: 28rpx;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+.textarea {
+    min-height: 160rpx;
+}
+
+.picker {
+    display: flex;
+    align-items: center;
+    color: #666;
+}
+
+/* 图片区域 */
+.image-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16rpx;
+}
+
+.preview-image {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: 8rpx;
+}
+
+.add-image {
+    width: 160rpx;
+    height: 160rpx;
+    border: 2rpx dashed #ccc;
+    border-radius: 8rpx;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #fafafa;
+}
+
+.add-icon {
+    font-size: 48rpx;
+    color: #999;
+    line-height: 1;
+}
+
+.add-text {
+    font-size: 22rpx;
+    color: #999;
+    margin-top: 8rpx;
+}
+
+/* 提交按钮 */
+.submit-btn {
+    margin-top: 60rpx;
+    width: 100%;
+    height: 88rpx;
+    background-color: #07c160;
+    color: #fff;
+    font-size: 32rpx;
+    border-radius: 8rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

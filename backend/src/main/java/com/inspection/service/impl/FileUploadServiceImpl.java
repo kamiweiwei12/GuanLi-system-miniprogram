@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
@@ -69,7 +71,9 @@ public class FileUploadServiceImpl implements FileUploadService {
             Path targetDir = Paths.get(uploadPath, today);
             Files.createDirectories(targetDir);
             Path targetFile = targetDir.resolve(newFileName);
-            file.transferTo(targetFile.toFile());
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
+            }
             log.info("文件上传成功：{}", targetFile);
         } catch (IOException e) {
             log.error("文件保存失败", e);

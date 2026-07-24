@@ -1,0 +1,67 @@
+<!-- pages/report/report.wxml -->
+<view class="container">
+  <view class="form-group">
+    <text class="label">部门</text>
+    <input class="input" value="{{form.department}}" bindinput="onDepartmentInput" placeholder="请输入部门" />
+  </view>
+
+  <view class="form-group">
+    <text class="label">姓名</text>
+    <input class="input" value="{{form.employeeName}}" bindinput="onEmployeeNameInput" placeholder="请输入姓名" />
+  </view>
+
+  <view class="form-group">
+    <text class="label">手机号</text>
+    <input class="input" type="number" value="{{form.phoneNumber}}" bindinput="onPhoneNumberInput" placeholder="请输入手机号" />
+  </view>
+
+  <view class="form-group">
+    <text class="label">区域</text>
+    <input class="input" value="{{form.area}}" bindinput="onAreaInput" placeholder="请输入巡检区域" />
+  </view>
+
+  <view class="form-group">
+    <text class="label">巡检日期</text>
+    <picker mode="date" value="{{form.inspectionTime}}" bindchange="onDateChange">
+      <view class="picker">
+        {{form.inspectionTime || '请选择日期'}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-group">
+    <text class="label">设备名称</text>
+    <input class="input" value="{{form.deviceName}}" bindinput="onDeviceNameInput" placeholder="请输入设备名称" />
+  </view>
+
+  <view class="form-group">
+    <text class="label">巡检结果</text>
+    <picker mode="selector" range="{{resultOptions}}" value="{{resultIndex}}" bindchange="onResultChange">
+      <view class="picker">
+        {{resultOptions[resultIndex]}}
+      </view>
+    </picker>
+  </view>
+
+  <view class="form-group">
+    <text class="label">详细描述</text>
+    <textarea class="textarea" value="{{form.description}}" bindinput="onDescriptionInput" placeholder="请输入详细描述（可选）" maxlength="500" />
+  </view>
+
+  <!-- 图片区域（预留） -->
+  <view class="form-group">
+    <text class="label">现场照片</text>
+    <view class="image-grid">
+      <block wx:for="{{images}}" wx:key="*this">
+        <image class="preview-image" src="{{item}}" mode="aspectFill" bindtap="previewImage" bindlongpress="deleteImage" data-index="{{index}}" />
+      </block>
+      <view class="add-image" bindtap="chooseImage">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加图片</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <button class="submit-btn" bindtap="submit">提交</button>
+</view>
