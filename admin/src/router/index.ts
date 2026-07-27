@@ -39,13 +39,23 @@ const router = createRouter({
     routes,
 });
 
-// 全局路由守卫：无 token 时跳转登录页
+// 全局路由守卫
 router.beforeEach((to, _from, next) => {
     const token = getToken();
-    if (to.path !== '/login' && !token) {
-        next('/login');
+    if (to.path === '/login') {
+        // 已登录用户访问登录页 → 跳转 dashboard
+        if (token) {
+            next('/dashboard');
+        } else {
+            next();
+        }
     } else {
-        next();
+        // 未登录用户访问后台页面 → 跳转登录页
+        if (!token) {
+            next('/login');
+        } else {
+            next();
+        }
     }
 });
 
