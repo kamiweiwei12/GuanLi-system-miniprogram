@@ -36,4 +36,38 @@ function clear(): void {
     }
 }
 
-export default { set, get, remove, clear };
+// ===== Token =====
+const TOKEN_KEY = 'auth_token';
+
+function setToken(token: string): void {
+    set(TOKEN_KEY, token);
+}
+
+function getToken(): string | null {
+    return get(TOKEN_KEY);
+}
+
+function removeToken(): void {
+    remove(TOKEN_KEY);
+}
+
+// ===== Role =====
+const ROLE_KEY = 'user_role';
+
+function setRole(role: string): void {
+    set(ROLE_KEY, role);
+}
+
+function getRole(): string {
+    return get(ROLE_KEY) || 'EMPLOYEE';
+}
+
+function removeRole(): void {
+    remove(ROLE_KEY);
+}
+
+export default {
+    set, get, remove, clear,
+    setToken, getToken, removeToken,
+    setRole, getRole, removeRole,
+};

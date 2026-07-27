@@ -1,27 +1,28 @@
-<!--index.wxml-->
-<scroll-view class="scrollarea" scroll-y type="list">
-  <view class="container">
-    <view class="userinfo">
-      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        </button>
-        <view class="nickname-wrapper">
-          <text class="nickname-label">昵称</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
-        </view>
-      </block>
-      <block wx:elif="{{!hasUserInfo}}">
-        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
-      </block>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
-    </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
-    </view>
+<!-- pages/index/index.wxml -->
+<!-- 巡检系统首页 — 根据角色显示不同功能入口 -->
+<view class="container">
+  <view class="welcome">
+    <text class="title">巡检管理系统</text>
+    <text class="subtitle" wx:if="{{isAdmin}}">管理员模式</text>
+    <text class="subtitle" wx:else>员工模式</text>
   </view>
-</scroll-view>
+
+  <view class="actions">
+    <!-- 所有人都可新增巡检 -->
+    <button class="btn btn-primary" bindtap="goToReport">新增巡检上报</button>
+
+    <!-- EMPLOYEE：查看自己的记录 -->
+    <button class="btn btn-secondary" wx:if="{{!isAdmin}}" bindtap="goToRecord">我的巡检记录</button>
+
+    <!-- ADMIN：查看全部记录 -->
+    <button class="btn btn-secondary" wx:if="{{isAdmin}}" bindtap="goToRecord">全部巡检记录</button>
+
+    <!-- ADMIN：管理功能入口（预留） -->
+    <button class="btn btn-admin" wx:if="{{isAdmin}}" bindtap="goToAdmin">管理功能</button>
+  </view>
+
+  <!-- 预留 userInfo 展示位置（未来扩展） -->
+  <view class="user-section" wx:if="{{userInfo.nickName}}">
+    <text class="user-name">{{userInfo.nickName}}</text>
+  </view>
+</view>

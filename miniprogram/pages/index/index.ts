@@ -1,59 +1,34 @@
-// index.ts
-// 获取应用实例
+// pages/index/index.ts
+// 巡检系统首页 — 根据角色显示不同功能入口
+import auth from '../../utils/auth';
 
-const app = getApp<IAppOption>()
-const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
-Component({
-  data: {
-    motto: 'Hello World',
-    userInfo: {
-      avatarUrl: defaultAvatarUrl,
-      nickName: '',
+Page({
+    data: {
+        isAdmin: auth.isAdmin(),
+        userInfo: {} as WechatMiniprogram.UserInfo | null,
     },
-    hasUserInfo: false,
-    canIUseGetUserProfile: wx.canIUse('getUserProfile'),
-    canIUseNicknameComp: wx.canIUse('input.type.nickname'),
-  },
-  methods: {
-    // 事件处理函数
-    bindViewTap() {
-      wx.navigateTo({
-        url: '../logs/logs',
-      })
+
+    onLoad() {
+        // 页面加载
     },
-    onChooseAvatar(e: any) {
-      const { avatarUrl } = e.detail
-      const { nickName } = this.data.userInfo
-      this.setData({
-        "userInfo.avatarUrl": avatarUrl,
-        hasUserInfo: nickName && avatarUrl && avatarUrl !== defaultAvatarUrl,
-      })
+
+    onShow() {
+        // 每次显示时刷新角色状态（支持角色切换）
+        this.setData({ isAdmin: auth.isAdmin() });
     },
-    onInputChange(e: any) {
-      const nickName = e.detail.value
-      const { avatarUrl } = this.data.userInfo
-      this.setData({
-        "userInfo.nickName": nickName,
-        hasUserInfo: nickName && avatarUrl && avatarUrl !== defaultAvatarUrl,
-      })
+
+    /** 跳转到巡检记录列表（非管理员查看自己的，管理员查看全部） */
+    goToRecord() {
+        wx.navigateTo({ url: '/pages/record/record' });
     },
-    getUserProfile() {
-      // 推荐使用wx.getUserProfile获取用户信息，开发者每次通过该接口获取用户个人信息均需用户确认，开发者妥善保管用户快速填写的头像昵称，避免重复弹窗
-      wx.getUserProfile({
-        desc: '展示用户信息', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
-        success: (res) => {
-          console.log(res)
-          this.setData({
-            userInfo: res.userInfo,
-            hasUserInfo: true
-          })
-        }
-      })
+
+    /** 跳转到巡检上报页面 */
+    goToReport() {
+        wx.navigateTo({ url: '/pages/report/report' });
     },
-  },
-  lifetimes: {
-    attached() {
-      // 页面初始化
-    }
-  },
-})
+
+    /** 跳转到管理功能页面（预留，未来扩展） */
+    goToAdmin() {
+        wx.navigateTo({ url: '/pages/record/record' });
+    },
+});
