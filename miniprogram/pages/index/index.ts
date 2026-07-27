@@ -4,7 +4,7 @@ import auth from '../../utils/auth';
 
 Page({
     data: {
-        isAdmin: auth.isAdmin(),
+        isAdmin: false,
         userInfo: {} as WechatMiniprogram.UserInfo | null,
     },
 
