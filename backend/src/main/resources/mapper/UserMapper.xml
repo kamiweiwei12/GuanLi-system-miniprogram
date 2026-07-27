@@ -19,6 +19,17 @@
         <result column="is_deleted" property="isDeleted"/>
     </resultMap>
 
+    <resultMap id="UserVOResultMap" type="com.inspection.vo.UserVO">
+        <id column="id" property="id"/>
+        <result column="nickname" property="nickname"/>
+        <result column="phone" property="phone"/>
+        <result column="dept_name" property="departmentName"/>
+        <result column="role_code" property="roleCode"/>
+        <result column="role_name" property="roleName"/>
+        <result column="status" property="status"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
+
     <insert id="insert" parameterType="com.inspection.entity.User"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO sys_user (
@@ -53,5 +64,49 @@
         </set>
         WHERE id = #{id}
     </update>
+
+    <!-- 用户列表分页（JOIN sys_role + sys_department，不含 openid） -->
+    <select id="selectPage" parameterType="com.inspection.dto.UserQueryDTO" resultMap="UserVOResultMap">
+        SELECT u.id, u.nickname, u.phone, u.status, u.created_at,
+               d.dept_name, r.role_code, r.role_name
+        FROM sys_user u
+        LEFT JOIN sys_department d ON u.department_id = d.id
+        LEFT JOIN sys_role r ON u.role_id = r.id
+        WHERE u.is_deleted = 0
+        <if test="nickname != null and nickname != ''">
+            AND u.nickname LIKE CONCAT('%', #{nickname}, '%')
+        </if>
+        <if test="phone != null and phone != ''">
+            AND u.phone LIKE CONCAT('%', #{phone}, '%')
+        </if>
+        <if test="roleCode != null and roleCode != ''">
+            AND r.role_code = #{roleCode}
+        </if>
+        <if test="departmentId != null">
+            AND u.department_id = #{departmentId}
+        </if>
+        ORDER BY u.created_at DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 用户总数（带筛选） -->
+    <select id="countUsers" parameterType="com.inspection.dto.UserQueryDTO" resultType="long">
+        SELECT COUNT(*)
+        FROM sys_user u
+        LEFT JOIN sys_role r ON u.role_id = r.id
+        WHERE u.is_deleted = 0
+        <if test="nickname != null and nickname != ''">
+            AND u.nickname LIKE CONCAT('%', #{nickname}, '%')
+        </if>
+        <if test="phone != null and phone != ''">
+            AND u.phone LIKE CONCAT('%', #{phone}, '%')
+        </if>
+        <if test="roleCode != null and roleCode != ''">
+            AND r.role_code = #{roleCode}
+        </if>
+        <if test="departmentId != null">
+            AND u.department_id = #{departmentId}
+        </if>
+    </select>
 
 </mapper>
