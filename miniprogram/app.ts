@@ -5,6 +5,7 @@ import storage from './utils/storage';
 interface IAppOption {
     globalData: {
         role?: string;
+        userId?: number;
     };
 }
 
@@ -12,6 +13,7 @@ interface IAppOption {
 App<IAppOption>({
     globalData: {
         role: undefined,
+        userId: undefined,
     },
     onLaunch() {
         // 微信小程序登录
@@ -22,9 +24,11 @@ App<IAppOption>({
                         const data = await login(res.code);
                         storage.setToken(data.token);
                         storage.setRole(data.role);
+                        storage.setUserId(data.userId);
                         // 同步更新 globalData
                         const app = getApp<IAppOption>();
                         app.globalData.role = data.role;
+                        app.globalData.userId = data.userId;
                         console.log('登录成功: userId=', data.userId, 'role=', data.role);
                     } catch (err) {
                         console.error('登录失败', err);

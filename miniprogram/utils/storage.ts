@@ -66,8 +66,24 @@ function removeRole(): void {
     remove(ROLE_KEY);
 }
 
+// ===== UserId =====
+const USER_ID_KEY = 'user_id';
+
+function setUserId(userId: number): void {
+    set(USER_ID_KEY, userId);
+}
+
+function getUserId(): number | null {
+    return get(USER_ID_KEY);
+}
+
+function removeUserId(): void {
+    remove(USER_ID_KEY);
+}
+
 export default {
     set, get, remove, clear,
     setToken, getToken, removeToken,
     setRole, getRole, removeRole,
+    setUserId, getUserId, removeUserId,
 };

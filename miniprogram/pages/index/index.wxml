@@ -7,7 +7,7 @@
     <text class="subtitle" wx:else>员工模式</text>
   </view>
 
-  <view class="actions">
+  <view class="actions" wx:if="{{loggedIn}}">
     <!-- 所有人都可新增巡检 -->
     <button class="btn btn-primary" bindtap="goToReport">新增巡检上报</button>
 
@@ -19,6 +19,16 @@
 
     <!-- ADMIN：管理功能入口（预留） -->
     <button class="btn btn-admin" wx:if="{{isAdmin}}" bindtap="goToAdmin">管理功能</button>
+  </view>
+
+  <!-- 未登录提示 -->
+  <view class="empty" wx:if="{{!loggedIn}}">
+    <text class="empty-text">请重新打开小程序以登录</text>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-section">
+    <button class="btn-logout" wx:if="{{loggedIn}}" bindtap="handleLogout">退出登录</button>
   </view>
 
   <!-- 预留 userInfo 展示位置（未来扩展） -->
