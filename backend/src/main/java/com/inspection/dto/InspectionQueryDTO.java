@@ -15,6 +15,7 @@ public class InspectionQueryDTO {
     private String deviceName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private String department;
 
     public Long getUserId() {
         return userId;
@@ -78,6 +79,14 @@ public class InspectionQueryDTO {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
     /**

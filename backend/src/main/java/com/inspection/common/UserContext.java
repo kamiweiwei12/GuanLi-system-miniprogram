@@ -8,8 +8,8 @@ public class UserContext {
 
     private static final ThreadLocal<UserInfo> USER_HOLDER = new ThreadLocal<>();
 
-    public static void setUser(Long userId, Long roleId, String roleCode) {
-        USER_HOLDER.set(new UserInfo(userId, roleId, roleCode));
+    public static void setUser(Long userId, Long roleId, String roleCode, Long departmentId) {
+        USER_HOLDER.set(new UserInfo(userId, roleId, roleCode, departmentId));
     }
 
     public static Long getUserId() {
@@ -27,8 +27,17 @@ public class UserContext {
         return info != null ? info.roleCode : null;
     }
 
+    public static Long getDepartmentId() {
+        UserInfo info = USER_HOLDER.get();
+        return info != null ? info.departmentId : null;
+    }
+
     public static boolean isAdmin() {
         return "ADMIN".equals(getRoleCode());
+    }
+
+    public static boolean isDeptAdmin() {
+        return "DEPT_ADMIN".equals(getRoleCode());
     }
 
     public static void clear() {
@@ -42,11 +51,13 @@ public class UserContext {
         private final Long userId;
         private final Long roleId;
         private final String roleCode;
+        private final Long departmentId;
 
-        UserInfo(Long userId, Long roleId, String roleCode) {
+        UserInfo(Long userId, Long roleId, String roleCode, Long departmentId) {
             this.userId = userId;
             this.roleId = roleId;
             this.roleCode = roleCode;
+            this.departmentId = departmentId;
         }
     }
 }

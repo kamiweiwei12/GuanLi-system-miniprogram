@@ -71,6 +71,9 @@
         <if test="userId != null">
             AND user_id = #{userId}
         </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
         <if test="area != null and area != ''">
             AND area = #{area}
         </if>
@@ -96,6 +99,9 @@
         WHERE is_deleted = 0
         <if test="userId != null">
             AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
         </if>
         <if test="area != null and area != ''">
             AND area = #{area}

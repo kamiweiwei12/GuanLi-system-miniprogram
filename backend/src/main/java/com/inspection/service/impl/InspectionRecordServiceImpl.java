@@ -3,9 +3,11 @@ package com.inspection.service.impl;
 import com.inspection.common.PageResult;
 import com.inspection.dto.InspectionQueryDTO;
 import com.inspection.dto.InspectionReportDTO;
+import com.inspection.entity.Department;
 import com.inspection.entity.InspectionImage;
 import com.inspection.entity.InspectionRecord;
 import com.inspection.exception.BusinessException;
+import com.inspection.mapper.DepartmentMapper;
 import com.inspection.mapper.InspectionImageMapper;
 import com.inspection.mapper.InspectionRecordMapper;
 import com.inspection.common.UserContext;
@@ -27,6 +29,7 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
 
     private final InspectionRecordMapper recordMapper;
     private final InspectionImageMapper imageMapper;
+    private final DepartmentMapper departmentMapper;
 
     @Value("${file.base-url}")
     private String fileBaseUrl;
@@ -35,9 +38,11 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
      * 构造器注入
      */
     public InspectionRecordServiceImpl(InspectionRecordMapper recordMapper,
-                                        InspectionImageMapper imageMapper) {
+                                        InspectionImageMapper imageMapper,
+                                        DepartmentMapper departmentMapper) {
         this.recordMapper = recordMapper;
         this.imageMapper = imageMapper;
+        this.departmentMapper = departmentMapper;
     }
 
     @Override
@@ -60,7 +65,7 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
         recordMapper.insert(record);
         Long recordId = record.getId();
 
-        // 4. 插入图片（如果有）
+        // 5. 插入图片（如果有）
         List<String> imageUrls = dto.getImageUrls();
         if (imageUrls != null && !imageUrls.isEmpty()) {
             for (String url : imageUrls) {
@@ -96,9 +101,26 @@ public class InspectionRecordServiceImpl implements InspectionRecordService {
 
     @Override
     public PageResult<InspectionRecordVO> queryList(InspectionQueryDTO dto) {
-        // 权限过滤：非 ADMIN 角色只查自己的数据
-        if (UserContext.getUserId() != null && !UserContext.isAdmin()) {
-            dto.setUserId(UserContext.getUserId());
+        Long userId = UserContext.getUserId();
+        String roleCode = UserContext.getRoleCode();
+
+        // 权限过滤：ADMIN > DEPT_ADMIN > EMPLOYEE
+        if (userId != null) {
+            if ("ADMIN".equals(roleCode)) {
+                // ADMIN：不过滤，查看全部
+            } else if ("DEPT_ADMIN".equals(roleCode)) {
+                // DEPT_ADMIN：只查本部门
+                Long deptId = UserContext.getDepartmentId();
+                if (deptId != null) {
+                    Department dept = departmentMapper.selectById(deptId);
+                    if (dept != null) {
+                        dto.setDepartment(dept.getDeptName());
+                    }
+                }
+            } else {
+                // EMPLOYEE：只查自己的
+                dto.setUserId(userId);
+            }
         }
 
         // 参数校验

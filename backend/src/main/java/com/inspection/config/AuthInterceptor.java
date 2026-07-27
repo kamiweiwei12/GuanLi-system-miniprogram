@@ -15,7 +15,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
  * 认证拦截器
- * 校验 Authorization: Bearer {token}，解析 userId/roleId/roleCode 存入 UserContext
+ * 校验 Authorization: Bearer {token}，解析 userId/roleId/roleCode/departmentId 存入 UserContext
  */
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
@@ -50,7 +50,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        // 查询用户信息获取角色
+        // 查询用户信息获取角色和部门
         User user = userMapper.selectById(userId);
         if (user == null) {
             writeUnauthorized(response, "用户不存在");
@@ -59,7 +59,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         Role role = roleMapper.selectById(user.getRoleId());
         String roleCode = role != null ? role.getRoleCode() : "EMPLOYEE";
 
-        UserContext.setUser(userId, user.getRoleId(), roleCode);
+        UserContext.setUser(userId, user.getRoleId(), roleCode, user.getDepartmentId());
         return true;
     }
 
