@@ -4,12 +4,22 @@
  * 注意：此工具不处理 UI（Toast/Loading），由调用方自行处理
  */
 import config from '../config/env';
+import storage from './storage';
 
 interface RequestOptions {
     url: string;
     method?: 'GET' | 'POST';
     data?: any;
     header?: Record<string, string>;
+}
+
+/**
+ * 获取 Authorization header 值
+ * 如果已登录则返回 "Bearer {token}"，否则返回空字符串
+ */
+function getAuthHeader(): string {
+    const token = storage.getToken();
+    return token ? 'Bearer ' + token : '';
 }
 
 interface ApiResponse<T = any> {
@@ -27,6 +37,7 @@ function request<T = any>(options: RequestOptions): Promise<T> {
             data: options.data || {},
             header: {
                 'Content-Type': 'application/json',
+                'Authorization': getAuthHeader(),
                 ...options.header
             },
             success(res) {

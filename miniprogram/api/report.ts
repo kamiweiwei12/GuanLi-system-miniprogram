@@ -39,6 +39,16 @@ export function getReportDetail(id: number): Promise<any> {
     return get(`/report/${id}`);
 }
 
+export function login(code: string): Promise<LoginVO> {
+    return post<LoginVO>('/login', { code });
+}
+
 export function uploadImage(filePath: string): Promise<string> {
     return upload(filePath);
+}
+
+interface LoginVO {
+    token: string;
+    userId: number;
+    role: string;
 }

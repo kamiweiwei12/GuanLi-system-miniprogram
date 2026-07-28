@@ -47,4 +47,12 @@ public interface InspectionRecordMapper {
 
     /** 按日期分组统计 */
     List<Map<String, Object>> countByDate(StatisticsQueryDTO dto);
+
+    // ===== 导出方法 =====
+
+    /**
+     * 条件查询（不分页，用于导出）
+     * 复用 selectByCondition 的 WHERE 逻辑，去掉 LIMIT
+     */
+    List<InspectionRecord> selectForExport(InspectionQueryDTO dto);
 }

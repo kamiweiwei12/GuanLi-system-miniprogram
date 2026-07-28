@@ -30,6 +30,7 @@
         <el-form-item>
           <el-button type="primary" @click="search">查询</el-button>
           <el-button @click="resetFilters">重置</el-button>
+          <el-button type="success" @click="exportExcel" :loading="exporting">导出 Excel</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -100,7 +101,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { getReportList, getReportDetail, InspectionRecordVO } from '@/api/report';
+import { ElMessage } from 'element-plus';
+import { getReportList, getReportDetail, exportReport, InspectionRecordVO } from '@/api/report';
 
 const list = ref<InspectionRecordVO[]>([]);
 const total = ref(0);
@@ -112,6 +114,7 @@ const filters = ref({ area: '', deviceName: '', result: null as number | null })
 
 const detailVisible = ref(false);
 const detail = ref<InspectionRecordVO | null>(null);
+const exporting = ref(false);
 
 onMounted(() => loadData());
 
@@ -148,6 +151,24 @@ function resetFilters() {
 async function openDetail(id: number) {
     detailVisible.value = true;
     detail.value = await getReportDetail(id);
+}
+
+async function exportExcel() {
+    exporting.value = true;
+    try {
+        await exportReport({
+            area: filters.value.area || undefined,
+            deviceName: filters.value.deviceName || undefined,
+            result: filters.value.result ?? undefined,
+            startTime: dateRange.value?.[0] ? dateRange.value[0] + 'T00:00:00' : undefined,
+            endTime: dateRange.value?.[1] ? dateRange.value[1] + 'T23:59:59' : undefined,
+        });
+        ElMessage.success('导出成功');
+    } catch (e: any) {
+        ElMessage.error(e.message || '导出失败');
+    } finally {
+        exporting.value = false;
+    }
 }
 
 function resultText(result: number) {

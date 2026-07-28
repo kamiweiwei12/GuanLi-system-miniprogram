@@ -1,15 +1,15 @@
 {
   "pages": [
+        "pages/index/index",
     "pages/record/record",
-    "pages/report/report",
 
+    "pages/report/report",
     "pages/detail/detail",
-    "pages/index/index",
     "pages/logs/logs"
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
+    "navigationBarTitleText": "巡检系统",
     "navigationBarBackgroundColor": "#ffffff"
   },
   "style": "v2",

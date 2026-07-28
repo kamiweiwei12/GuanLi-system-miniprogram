@@ -21,6 +21,10 @@ file:
   access-prefix: /uploads
   base-url: ${FILE_BASE_URL:http://localhost:8080}
 
+wx:
+  app-id: ${WX_APP_ID:}
+  app-secret: ${WX_APP_SECRET:}
+
 logging:
   level:
     root: INFO

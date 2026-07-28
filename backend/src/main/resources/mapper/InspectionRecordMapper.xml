@@ -119,6 +119,36 @@
         </if>
     </select>
 
+    <!-- ===== 导出方法 ===== -->
+
+    <!-- 条件查询（不分页，用于导出） -->
+    <select id="selectForExport" parameterType="com.inspection.dto.InspectionQueryDTO" resultMap="BaseResultMap">
+        SELECT * FROM inspection_record
+        WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="result != null">
+            AND result = #{result}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name LIKE CONCAT('%', #{deviceName}, '%')
+        </if>
+        <if test="startTime != null">
+            AND inspection_time >= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND inspection_time &lt;= #{endTime}
+        </if>
+        ORDER BY created_at DESC
+    </select>
+
     <!-- ===== 统计方法 ===== -->
 
     <select id="countForStats" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="long">
