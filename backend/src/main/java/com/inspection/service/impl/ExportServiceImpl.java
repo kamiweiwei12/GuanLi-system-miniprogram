@@ -5,6 +5,7 @@ import com.inspection.dto.InspectionQueryDTO;
 import com.inspection.entity.Department;
 import com.inspection.entity.InspectionImage;
 import com.inspection.entity.InspectionRecord;
+import com.inspection.exception.BusinessException;
 import com.inspection.mapper.DepartmentMapper;
 import com.inspection.mapper.InspectionImageMapper;
 import com.inspection.mapper.InspectionRecordMapper;
@@ -48,27 +49,36 @@ public class ExportServiceImpl implements ExportService {
         Long userId = UserContext.getUserId();
         String roleCode = UserContext.getRoleCode();
 
+        // 创建副本，不修改原始 DTO
+        InspectionQueryDTO filteredDto = new InspectionQueryDTO();
+        filteredDto.setArea(dto.getArea());
+        filteredDto.setResult(dto.getResult());
+        filteredDto.setDeviceName(dto.getDeviceName());
+        filteredDto.setStartTime(dto.getStartTime());
+        filteredDto.setEndTime(dto.getEndTime());
+
         // 权限过滤：ADMIN > DEPT_ADMIN > EMPLOYEE
-        if (userId != null) {
-            if ("ADMIN".equals(roleCode)) {
-                // ADMIN：不过滤，导出全部
-            } else if ("DEPT_ADMIN".equals(roleCode)) {
-                // DEPT_ADMIN：只导出本部门
-                Long deptId = UserContext.getDepartmentId();
-                if (deptId != null) {
-                    Department dept = departmentMapper.selectById(deptId);
-                    if (dept != null) {
-                        dto.setDepartment(dept.getDeptName());
-                    }
+        if ("ADMIN".equals(roleCode)) {
+            // ADMIN：不过滤，导出全部
+        } else if ("DEPT_ADMIN".equals(roleCode)) {
+            // DEPT_ADMIN：只导出本部门
+            Long deptId = UserContext.getDepartmentId();
+            if (deptId != null) {
+                Department dept = departmentMapper.selectById(deptId);
+                if (dept != null) {
+                    filteredDto.setDepartment(dept.getDeptName());
                 }
-            } else {
-                // EMPLOYEE：只导出自己的
-                dto.setUserId(userId);
             }
+        } else {
+            // EMPLOYEE：只导出自己的
+            if (userId == null) {
+                throw new BusinessException(401, "未认证");
+            }
+            filteredDto.setUserId(userId);
         }
 
         // 查询全量数据（不分页）
-        List<InspectionRecord> records = recordMapper.selectForExport(dto);
+        List<InspectionRecord> records = recordMapper.selectForExport(filteredDto);
 
         // 生成 Excel
         try (Workbook workbook = new XSSFWorkbook()) {
