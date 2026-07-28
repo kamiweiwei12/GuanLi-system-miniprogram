@@ -34,16 +34,19 @@ http.interceptors.response.use(
         if (body.code === 200) {
             return body.data as any;
         }
-        // 业务错误
-        if (body.code === 401 || body.code === 403) {
+        // 401: Token 无效或过期，清除 Token
+        if (body.code === 401) {
             removeToken();
         }
+        // 403: 权限不足，保留 Token（用户仍处于登录状态）
         return Promise.reject(new Error(body.message || '请求失败'));
     },
     (error) => {
-        if (error.response?.status === 401 || error.response?.status === 403) {
+        // 401: Token 无效或过期，清除 Token
+        if (error.response?.status === 401) {
             removeToken();
         }
+        // 403: 权限不足，保留 Token
         return Promise.reject(error);
     }
 );

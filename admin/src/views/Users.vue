@@ -119,6 +119,8 @@ async function loadData() {
         });
         list.value = res.list;
         total.value = res.total;
+    } catch (err: any) {
+        ElMessage.error('当前账号无权限访问用户管理');
     } finally {
         loading.value = false;
     }
@@ -146,7 +148,6 @@ async function handleStatusChange(userId: number, enabled: boolean) {
 
 function openRoleDialog(user: UserVO) {
     roleTarget.value = user;
-    // 根据 roleCode 映射 roleId（1=EMPLOYEE, 2=DEPT_ADMIN, 3=ADMIN）
     if (user.roleCode === 'ADMIN') selectedRoleId.value = 3;
     else if (user.roleCode === 'DEPT_ADMIN') selectedRoleId.value = 2;
     else selectedRoleId.value = 1;
