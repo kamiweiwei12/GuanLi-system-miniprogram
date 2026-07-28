@@ -15,10 +15,18 @@
           />
         </el-form-item>
         <el-form-item label="区域">
-          <el-input v-model="filters.area" placeholder="巡检区域" clearable />
+          <el-select v-model="filters.area" placeholder="请选择区域" clearable style="width: 150px;">
+            <el-option label="A区" value="A区" />
+            <el-option label="B区" value="B区" />
+            <el-option label="C区" value="C区" />
+          </el-select>
         </el-form-item>
         <el-form-item label="设备">
-          <el-input v-model="filters.deviceName" placeholder="设备名称" clearable />
+          <el-select v-model="filters.deviceName" placeholder="请选择设备" clearable style="width: 150px;">
+            <el-option label="空调设备" value="空调设备" />
+            <el-option label="服务器设备" value="服务器设备" />
+            <el-option label="监控设备" value="监控设备" />
+          </el-select>
         </el-form-item>
         <el-form-item label="结果">
           <el-select v-model="filters.result" placeholder="全部" clearable style="width: 120px;">
