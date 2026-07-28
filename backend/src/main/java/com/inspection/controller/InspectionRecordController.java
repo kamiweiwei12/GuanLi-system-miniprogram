@@ -2,10 +2,15 @@ package com.inspection.controller;
 
 import com.inspection.common.PageResult;
 import com.inspection.common.Result;
+import com.inspection.common.UserContext;
 import com.inspection.dto.InspectionQueryDTO;
 import com.inspection.dto.InspectionReportDTO;
+import com.inspection.entity.Department;
+import com.inspection.mapper.DepartmentMapper;
+import com.inspection.mapper.InspectionRecordMapper;
 import com.inspection.service.ExportService;
 import com.inspection.service.InspectionRecordService;
+import com.inspection.vo.FilterOptionsVO;
 import com.inspection.vo.InspectionRecordVO;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +25,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * 巡检记录控制器
@@ -30,11 +36,17 @@ public class InspectionRecordController {
 
     private final InspectionRecordService service;
     private final ExportService exportService;
+    private final InspectionRecordMapper recordMapper;
+    private final DepartmentMapper departmentMapper;
 
     public InspectionRecordController(InspectionRecordService service,
-                                       ExportService exportService) {
+                                       ExportService exportService,
+                                       InspectionRecordMapper recordMapper,
+                                       DepartmentMapper departmentMapper) {
         this.service = service;
         this.exportService = exportService;
+        this.recordMapper = recordMapper;
+        this.departmentMapper = departmentMapper;
     }
 
     @PostMapping("/report")
@@ -57,7 +69,6 @@ public class InspectionRecordController {
 
     @GetMapping("/report/export")
     public void exportReport(InspectionQueryDTO dto, HttpServletResponse response) throws IOException {
-        // 设置响应头
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String filename = "inspection_report_" + timestamp + ".xlsx";
         String encodedFilename = URLEncoder.encode(filename, StandardCharsets.UTF_8)
@@ -68,7 +79,32 @@ public class InspectionRecordController {
         response.setHeader("Content-Disposition",
                 "attachment; filename=\"" + encodedFilename + "\"; filename*=UTF-8''" + encodedFilename);
 
-        // 生成 Excel 并写入响应流
         exportService.exportToExcel(dto, response.getOutputStream());
+    }
+
+    @GetMapping("/report/options")
+    public Result<FilterOptionsVO> getFilterOptions() {
+        InspectionQueryDTO dto = new InspectionQueryDTO();
+        long userId = UserContext.getUserId();
+        String roleCode = UserContext.getRoleCode();
+
+        // 权限过滤
+        if ("ADMIN".equals(roleCode)) {
+            // 不过滤
+        } else if ("DEPT_ADMIN".equals(roleCode)) {
+            Long deptId = UserContext.getDepartmentId();
+            if (deptId != null) {
+                Department dept = departmentMapper.selectById(deptId);
+                if (dept != null) {
+                    dto.setDepartment(dept.getDeptName());
+                }
+            }
+        } else {
+            dto.setUserId(userId);
+        }
+
+        List<String> areas = recordMapper.selectDistinctAreas(dto);
+        List<String> devices = recordMapper.selectDistinctDevices(dto);
+        return Result.success(new FilterOptionsVO(areas, devices));
     }
 }

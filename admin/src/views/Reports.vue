@@ -15,21 +15,20 @@
           />
         </el-form-item>
         <el-form-item label="区域">
-          <el-select v-model="filters.area" placeholder="请选择区域" clearable style="width: 150px;">
-            <el-option label="A区" value="A区" />
-            <el-option label="B区" value="B区" />
-            <el-option label="C区" value="C区" />
+          <el-select v-model="filters.area" placeholder="全部" clearable style="width: 150px;">
+            <el-option label="全部" :value="null" />
+            <el-option v-for="a in filterOptions.areas" :key="a" :label="a" :value="a" />
           </el-select>
         </el-form-item>
         <el-form-item label="设备">
-          <el-select v-model="filters.deviceName" placeholder="请选择设备" clearable style="width: 150px;">
-            <el-option label="空调设备" value="空调设备" />
-            <el-option label="服务器设备" value="服务器设备" />
-            <el-option label="监控设备" value="监控设备" />
+          <el-select v-model="filters.deviceName" placeholder="全部" clearable style="width: 150px;">
+            <el-option label="全部" :value="null" />
+            <el-option v-for="d in filterOptions.devices" :key="d" :label="d" :value="d" />
           </el-select>
         </el-form-item>
         <el-form-item label="结果">
           <el-select v-model="filters.result" placeholder="全部" clearable style="width: 120px;">
+            <el-option label="全部" :value="null" />
             <el-option label="正常" :value="0" />
             <el-option label="故障" :value="1" />
             <el-option label="隐患" :value="2" />
@@ -110,7 +109,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { getReportList, getReportDetail, exportReport, InspectionRecordVO } from '@/api/report';
+import { getReportList, getReportDetail, getFilterOptions, exportReport, InspectionRecordVO, FilterOptions } from '@/api/report';
 
 const list = ref<InspectionRecordVO[]>([]);
 const total = ref(0);
@@ -118,13 +117,30 @@ const currentPage = ref(1);
 const pageSize = ref(10);
 const loading = ref(false);
 const dateRange = ref<[string, string] | null>(null);
-const filters = ref({ area: '', deviceName: '', result: null as number | null });
+const filters = ref<{ area: string | null; deviceName: string | null; result: number | null }>({
+    area: null,
+    deviceName: null,
+    result: null,
+});
+
+const filterOptions = ref<FilterOptions>({ areas: [], devices: [] });
 
 const detailVisible = ref(false);
 const detail = ref<InspectionRecordVO | null>(null);
 const exporting = ref(false);
 
-onMounted(() => loadData());
+onMounted(async () => {
+    await loadFilterOptions();
+    loadData();
+});
+
+async function loadFilterOptions() {
+    try {
+        filterOptions.value = await getFilterOptions();
+    } catch {
+        // 加载失败时使用空列表
+    }
+}
 
 async function loadData() {
     loading.value = true;
@@ -132,8 +148,8 @@ async function loadData() {
         const res = await getReportList({
             pageNum: currentPage.value,
             pageSize: pageSize.value,
-            area: filters.value.area || undefined,
-            deviceName: filters.value.deviceName || undefined,
+            area: filters.value.area ?? undefined,
+            deviceName: filters.value.deviceName ?? undefined,
             result: filters.value.result ?? undefined,
             startTime: dateRange.value?.[0] ? dateRange.value[0] + 'T00:00:00' : undefined,
             endTime: dateRange.value?.[1] ? dateRange.value[1] + 'T23:59:59' : undefined,
@@ -151,7 +167,7 @@ function search() {
 }
 
 function resetFilters() {
-    filters.value = { area: '', deviceName: '', result: null };
+    filters.value = { area: null, deviceName: null, result: null };
     dateRange.value = null;
     search();
 }
@@ -165,8 +181,8 @@ async function exportExcel() {
     exporting.value = true;
     try {
         await exportReport({
-            area: filters.value.area || undefined,
-            deviceName: filters.value.deviceName || undefined,
+            area: filters.value.area ?? undefined,
+            deviceName: filters.value.deviceName ?? undefined,
             result: filters.value.result ?? undefined,
             startTime: dateRange.value?.[0] ? dateRange.value[0] + 'T00:00:00' : undefined,
             endTime: dateRange.value?.[1] ? dateRange.value[1] + 'T23:59:59' : undefined,

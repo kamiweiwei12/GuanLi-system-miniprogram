@@ -29,11 +29,16 @@ export interface PageResult<T> {
 export interface ReportQueryParams {
     pageNum?: number;
     pageSize?: number;
-    area?: string;
-    result?: number;
-    deviceName?: string;
+    area?: string | null;
+    result?: number | null;
+    deviceName?: string | null;
     startTime?: string;
     endTime?: string;
+}
+
+export interface FilterOptions {
+    areas: string[];
+    devices: string[];
 }
 
 export function getReportList(params?: ReportQueryParams): Promise<PageResult<InspectionRecordVO>> {
@@ -45,6 +50,13 @@ export function getReportDetail(id: number): Promise<InspectionRecordVO> {
 }
 
 /**
+ * 获取筛选选项（区域和设备列表）
+ */
+export function getFilterOptions(): Promise<FilterOptions> {
+    return http.get('/report/options');
+}
+
+/**
  * 导出巡检记录（返回 blob 文件下载）
  * 需要单独处理：设置 responseType: 'blob'，绕过 http 拦截器的 JSON 解包
  */
@@ -53,13 +65,18 @@ export async function exportReport(params?: ReportQueryParams): Promise<void> {
     const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/report/export`,
         {
-            params,
+            params: {
+                area: params?.area || undefined,
+                deviceName: params?.deviceName || undefined,
+                result: params?.result ?? undefined,
+                startTime: params?.startTime,
+                endTime: params?.endTime,
+            },
             responseType: 'blob',
             headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
     );
 
-    // 从 Content-Disposition 获取文件名，或使用默认名
     const contentDisposition = response.headers['content-disposition'];
     let filename = 'inspection_report.xlsx';
     if (contentDisposition) {
@@ -74,7 +91,6 @@ export async function exportReport(params?: ReportQueryParams): Promise<void> {
         }
     }
 
-    // 创建下载链接
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;

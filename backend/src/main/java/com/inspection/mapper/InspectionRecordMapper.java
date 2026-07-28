@@ -55,4 +55,16 @@ public interface InspectionRecordMapper {
      * 复用 selectByCondition 的 WHERE 逻辑，去掉 LIMIT
      */
     List<InspectionRecord> selectForExport(InspectionQueryDTO dto);
+
+    // ===== 筛选选项方法 =====
+
+    /**
+     * 查询所有不重复的区域（支持权限过滤）
+     */
+    List<String> selectDistinctAreas(InspectionQueryDTO dto);
+
+    /**
+     * 查询所有不重复的设备名称（支持权限过滤）
+     */
+    List<String> selectDistinctDevices(InspectionQueryDTO dto);
 }
