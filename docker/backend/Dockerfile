@@ -8,8 +8,9 @@
 FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
 
-# 先复制 pom.xml，利用 Docker 缓存依赖下载
+# 先复制 pom.xml 和 Maven 镜像配置，利用 Docker 缓存依赖下载
 COPY pom.xml .
+COPY settings-docker.xml /root/.m2/settings.xml
 RUN mvn dependency:go-offline -q
 
 # 复制源码并编译
