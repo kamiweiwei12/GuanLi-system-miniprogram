@@ -119,8 +119,6 @@
         </if>
     </select>
 
-    <!-- ===== 导出方法 ===== -->
-
     <!-- 条件查询（不分页，用于导出） -->
     <select id="selectForExport" parameterType="com.inspection.dto.InspectionQueryDTO" resultMap="BaseResultMap">
         SELECT * FROM inspection_record
@@ -149,8 +147,7 @@
         ORDER BY created_at DESC
     </select>
 
-    <!-- ===== 统计方法 ===== -->
-
+    <!-- 统计总数 -->
     <select id="countForStats" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="long">
         SELECT COUNT(*) FROM inspection_record
         WHERE is_deleted = 0
@@ -165,6 +162,7 @@
         </if>
     </select>
 
+    <!-- 按巡检结果分组统计 -->
     <select id="countByResult" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="map">
         SELECT result, COUNT(*) as cnt FROM inspection_record
         WHERE is_deleted = 0
@@ -180,6 +178,7 @@
         GROUP BY result
     </select>
 
+    <!-- 按部门分组统计 -->
     <select id="countByDepartment" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="map">
         SELECT department, COUNT(*) as cnt FROM inspection_record
         WHERE is_deleted = 0
@@ -196,6 +195,7 @@
         ORDER BY cnt DESC
     </select>
 
+    <!-- 按日期分组统计 -->
     <select id="countByDate" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="map">
         SELECT DATE(inspection_time) as date, COUNT(*) as cnt
         FROM inspection_record
@@ -212,6 +212,32 @@
         GROUP BY DATE(inspection_time)
         ORDER BY date DESC
         LIMIT 30
+    </select>
+
+    <!-- 筛选选项：不重复区域（权限过滤） -->
+    <select id="selectDistinctAreas" parameterType="com.inspection.dto.InspectionQueryDTO" resultType="string">
+        SELECT DISTINCT area FROM inspection_record
+        WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        ORDER BY area
+    </select>
+
+    <!-- 筛选选项：不重复设备名称（权限过滤） -->
+    <select id="selectDistinctDevices" parameterType="com.inspection.dto.InspectionQueryDTO" resultType="string">
+        SELECT DISTINCT device_name FROM inspection_record
+        WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        ORDER BY device_name
     </select>
 
 </mapper>
