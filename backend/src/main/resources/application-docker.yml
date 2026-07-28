@@ -1,0 +1,35 @@
+# ============================================
+# Docker 环境配置
+# ============================================
+# 使用方式：java -jar app.jar --spring.profiles.active=docker
+#
+# 所有敏感配置从环境变量读取：
+#   SPRING_DATASOURCE_URL      - JDBC 连接串
+#   SPRING_DATASOURCE_USERNAME - 数据库用户名
+#   SPRING_DATASOURCE_PASSWORD - 数据库密码
+#   FILE_UPLOAD_PATH           - 图片上传目录（Docker 内：/data/uploads）
+#   FILE_BASE_URL              - 图片访问基础 URL
+#   WX_APP_ID                  - 微信小程序 AppID
+#   WX_APP_SECRET              - 微信小程序 Secret
+# ============================================
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 30000
+
+file:
+  upload-path: ${FILE_UPLOAD_PATH:/data/uploads}
+  base-url: ${FILE_BASE_URL:http://localhost:8080}
+
+wx:
+  app-id: ${WX_APP_ID:}
+  app-secret: ${WX_APP_SECRET:}

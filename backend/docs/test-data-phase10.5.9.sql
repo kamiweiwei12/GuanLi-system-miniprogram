@@ -30,7 +30,7 @@ INSERT IGNORE INTO sys_department (id, dept_name, parent_id) VALUES
 -- employee_a_test: EMPLOYEE, 运维部
 -- employee_b_test: EMPLOYEE, 工程部
 INSERT IGNORE INTO sys_user (id, openid, username, phone, department_id, role_id, status) VALUES
-    (101, 'test_openid_admin_101', 'admin_test',      '13800000001', 1, 3, 1),
+    (101, 'test_openid_admin_101', 'admin_test',      '13800000001', 1, 3, 3),
     (102, 'test_openid_dept_102',  'dept_admin_test', '13800000002', 1, 2, 1),
     (103, 'test_openid_emp_a_103', 'employee_a_test', '13800000003', 2, 1, 1),
     (104, 'test_openid_emp_b_104', 'employee_b_test', '13800000004', 1, 1, 1);
