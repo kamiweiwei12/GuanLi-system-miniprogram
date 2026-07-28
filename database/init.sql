@@ -134,3 +134,10 @@ CREATE INDEX idx_record_device
 -- 巡检图片：按记录 ID 关联查询
 CREATE INDEX idx_image_record_id
     ON inspection_image (record_id);
+
+-- ============================================
+-- 预置管理员（Docker 首次启动自动创建）
+-- ============================================
+INSERT IGNORE INTO sys_department (id, dept_name, parent_id) VALUES (1, '管理部', 0);
+INSERT IGNORE INTO sys_user (id, openid, username, phone, department_id, role_id, status) VALUES (1, 'admin_default', '系统管理员', NULL, 1, 3, 1);
+INSERT IGNORE INTO sys_token (user_id, token, expire_time) VALUES (1, 'admin-setup-token', '2099-12-31 23:59:59');
