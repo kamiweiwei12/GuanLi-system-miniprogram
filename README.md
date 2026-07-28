@@ -1,8 +1,60 @@
 # 企业微信巡检系统（Inspection Demo）
 
+## Docker 快速部署（推荐）
+
+### 环境要求
+
+- Docker Desktop（含 Docker Compose）
+
+### 三步启动
+
+```bash
+# 1. 创建环境变量文件
+copy docker\.env.example .env
+
+# 2. 编辑 .env 文件，设置 MySQL 密码
+# MYSQL_ROOT_PASSWORD=你的密码
+# MYSQL_USER=inspection
+# MYSQL_PASSWORD=你的密码
+# SPRING_DATASOURCE_USERNAME=inspection
+# SPRING_DATASOURCE_PASSWORD=你的密码
+
+# 3. 启动所有服务
+docker compose up -d
+```
+
+### 访问
+
+- 管理后台：http://localhost
+- 默认管理员 Token：`admin-setup-token`
+
+### Windows 一键启动
+
+双击 `start.bat`，自动检查 Docker 状态并启动所有服务。
+
+### 日常操作
+
+```bash
+docker compose up -d      # 启动
+docker compose down       # 停止（保留数据）
+docker compose down -v    # 停止并删除数据卷（⚠ 数据会丢失）
+docker compose logs -f    # 查看日志
+```
+
+### 常见问题
+
+| 问题 | 解决方案 |
+|------|----------|
+| 3306 端口被占用 | 停止本地 MySQL 服务，或修改 docker-compose.yml 中端口映射 |
+| Docker 未启动 | 先启动 Docker Desktop |
+| 首次构建慢 | 首次需下载镜像并编译，约 5-10 分钟 |
+| 页面访问 404 | 等待所有容器状态为 `Up` 后再访问 |
+
+---
+
 ## 项目简介
 
-一个企业内部巡检管理系统 Demo，支持：
+一个企业内部巡检管理系统，支持：
 
 - **普通员工**：通过微信小程序提交巡检记录（部门、姓名、区域、设备、图片、描述等）
 - **管理员**：通过 Web 后台查看、筛选、统计所有巡检记录
@@ -42,7 +94,7 @@
 │                    用户层                        │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
 │  │ 微信小程序 │  │ Vue3 Web │  │ AI Agent │      │
-│  │ (员工端)  │  │ (管理端)  │  │ (分析端) │      │
+│  │ (员工端)  │  │ (管理端)  │  │ (分析端)  │      │
 │  └─────┬────┘  └────┬─────┘  └────┬─────┘      │
 │        │            │             │             │
 ├────────┼────────────┼─────────────┼─────────────┤
@@ -71,9 +123,16 @@ miniprogram-1/
 │   ├── pages/            #   页面目录
 │   └── utils/            #   工具函数
 ├── backend/              # Spring Boot 后端（Java 21）
-├── admin-web/            # Vue3 管理后台
+├── admin/                # Vue3 管理后台
 ├── ai-analysis/          # Python AI 分析模块
 ├── database/             # 数据库脚本
+├── docker/               # Docker 配置
+│   ├── .env.example      #   环境变量模板
+│   ├── backend/          #   Spring Boot Dockerfile + Maven 镜像
+│   └── nginx/            #   Nginx Dockerfile + 配置
+├── docker-compose.yml    # Docker Compose 编排
+├── start.bat             # Windows 一键启动
+├── stop.bat              # Windows 停止
 ├── docs/                 # 项目文档
 │   ├── API.md            #   API 接口文档
 │   ├── 数据库设计.md      #   数据库表结构设计
@@ -148,32 +207,10 @@ chore: 项目初始化（目录结构 + Git 仓库 + .gitignore）
 | 第二阶段 | 数据库设计（业务分析 → 表设计 → init.sql） | ✅ 已完成 |
 | 第三阶段 | Spring Boot 初始化（项目骨架、多环境配置、启动验证） | ✅ 已完成 |
 | 第四阶段 | 后端业务开发（Entity → Mapper → Service → Controller → 查询 + 图片上传） | ✅ 已完成 |
-| 第五阶段 | 微信小程序开发（巡检上报 + 列表 + 详情） | 🟡 进行中 |
-| 第六阶段 | Vue3 管理后台（列表、分页、筛选、统计图） | ⬜ 待开始 |
+| 第五阶段 | 微信小程序开发（巡检上报 + 列表 + 详情） | ✅ 已完成 |
+| 第六阶段 | Vue3 管理后台（列表、分页、筛选、统计图） | ✅ 已完成 |
 | 第七阶段 | AI 分析（Python 脚本、日报、月报、AI 建议） | ⬜ 待开始 |
-| 第八阶段 | Docker 部署（Dockerfile、docker-compose、启动脚本） | ⬜ 待开始 |
-
----
-
-## 项目状态（Project Status）
-
-**当前阶段**：第四阶段 — 基础业务开发
-
-| 步骤 | 内容 | 状态 |
-|---|---|---|
-| Step 1-5 | 项目初始化 + 文档骨架 | ✅ 已完成 |
-| Step 6-8 | 数据库设计 + init.sql | ✅ 已完成 |
-| Step 9-10 | Spring Boot 骨架 + 包结构 + 配置 + 启动验证 | ✅ 已完成 |
-| Step 11 | 创建 Entity + Mapper（XML） | ✅ 已完成 |
-| Step 12 | 创建 Service + DTO + BusinessException | ✅ 已完成 |
-| Step 13 | 创建 Controller + Result + GlobalExceptionHandler | ✅ 已完成 |
-| Step 14 | 查询接口（GET /report + 分页 + 筛选） | ✅ 已完成 |
-| Step 15 | 图片上传接口（POST /upload/image） | ✅ 已完成 |
-| Step 16 | 微信小程序基础工程（环境配置 + 请求封装 + API模块） | ✅ 已完成 |
-| Step 17 | 微信小程序巡检上报（UI + 图片上传 + 提交） | ✅ 已完成 |
-| Step 18 | 巡检记录列表页面（分页 + 下拉刷新 + 状态颜色） | ✅ 已完成 |
-| Step 19 | 巡检记录详情页面 | ✅ 已完成 |
-| Step 20 | 后续开发 | 🟡 进行中 |
+| 第八阶段 | Docker 部署（Dockerfile、docker-compose、启动脚本） | ✅ 已完成 |
 
 ---
 
@@ -182,7 +219,3 @@ chore: 项目初始化（目录结构 + Git 仓库 + .gitignore）
 本项目遵循"最小变更 + 先计划再执行"的开发原则。
 
 每条 Commit 必须是独立、可运行、可回滚的最小单元。
-
----
-
-> 📌 注意：本文档与项目代码同步更新。尚未实现的功能（快速启动、API 使用、部署说明等）将在对应阶段完成后补充。
