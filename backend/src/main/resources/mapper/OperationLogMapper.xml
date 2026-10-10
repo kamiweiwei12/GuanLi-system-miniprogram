@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.inspection.mapper.OperationLogMapper">
+    <insert id="insert" parameterType="com.inspection.entity.OperationLog"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_operation_log (user_id, operation_type, target_desc, ip)
+        VALUES (#{userId}, #{operationType}, #{targetDesc}, #{ip})
+    </insert>
+</mapper>

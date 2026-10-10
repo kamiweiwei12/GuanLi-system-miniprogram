@@ -27,6 +27,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+// TODO Phase 14: 巡检记录删除为 Mapper 软删除，暂无 Controller DELETE 端点
+// 后续如增加 DELETE /api/v1/report/{id}，需在此注入 OperationLogService 记录日志
+
 /**
  * 巡检记录控制器
  */

@@ -1,7 +1,65 @@
 <template>
   <div class="dashboard-container">
-    <!-- 概览卡片 -->
+    <!-- Phase 14: 今日实时状态 -->
     <el-row :gutter="20" class="overview-row">
+      <el-col :span="6">
+        <el-card shadow="hover">
+          <div class="stat-label">今日巡检</div>
+          <div class="stat-value">{{ dashboard.todayCount }}</div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" class="card-danger">
+          <div class="stat-label">今日异常</div>
+          <div class="stat-value">{{ dashboard.todayAnomalies }}</div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover" class="card-rate">
+          <div class="stat-label">异常率</div>
+          <div class="stat-value rate-value">{{ dashboard.anomalyRate }}%</div>
+        </el-card>
+      </el-col>
+      <el-col :span="6">
+        <el-card shadow="hover">
+          <div class="stat-label">总巡检数</div>
+          <div class="stat-value">{{ dashboard.totalCount }}</div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 最近异常记录 -->
+    <el-row :gutter="20" style="margin-top: 20px;">
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <template #header><span>最近故障记录</span></template>
+          <el-table :data="dashboard.recentFaults" stripe size="small" max-height="220">
+            <el-table-column prop="deviceName" label="设备" width="80" />
+            <el-table-column prop="area" label="区域" width="60" />
+            <el-table-column prop="description" label="描述" min-width="100" show-overflow-tooltip />
+            <el-table-column label="时间" width="90">
+              <template #default="{ row }">{{ row.inspectionTime?.substring(0, 10) }}</template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card shadow="hover">
+          <template #header><span>最近隐患记录</span></template>
+          <el-table :data="dashboard.recentHiddens" stripe size="small" max-height="220">
+            <el-table-column prop="deviceName" label="设备" width="80" />
+            <el-table-column prop="area" label="区域" width="60" />
+            <el-table-column prop="description" label="描述" min-width="100" show-overflow-tooltip />
+            <el-table-column label="时间" width="90">
+              <template #default="{ row }">{{ row.inspectionTime?.substring(0, 10) }}</template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- Phase 10: 原有概览卡片 -->
+    <el-row :gutter="20" style="margin-top: 20px;">
       <el-col :span="6">
         <el-card shadow="hover">
           <div class="stat-label">总巡检数量</div>
@@ -57,6 +115,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import * as echarts from 'echarts';
 import { getStatistics, StatisticsVO } from '@/api/statistics';
+import { getDashboard, DashboardVO } from '@/api/dashboard';
 
 const stats = ref<StatisticsVO>({
     totalRecords: 0,
@@ -65,18 +124,32 @@ const stats = ref<StatisticsVO>({
     byDate: [],
 });
 
+const dashboard = ref<DashboardVO>({
+    todayCount: 0,
+    todayAnomalies: 0,
+    anomalyRate: 0,
+    totalCount: 0,
+    recentFaults: [],
+    recentHiddens: [],
+    topRiskAreas: [],
+});
+
 const trendChart = ref<HTMLDivElement | null>(null);
 const deptChart = ref<HTMLDivElement | null>(null);
 
 onMounted(async () => {
     try {
-        const data = await getStatistics();
-        stats.value = data;
+        const [statsData, dashData] = await Promise.all([
+            getStatistics(),
+            getDashboard(),
+        ]);
+        stats.value = statsData;
+        dashboard.value = dashData;
         await nextTick();
         renderTrendChart();
         renderDeptChart();
     } catch (err) {
-        console.error('获取统计数据失败', err);
+        console.error('获取数据失败', err);
     }
 });
 

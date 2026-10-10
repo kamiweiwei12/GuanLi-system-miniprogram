@@ -8,12 +8,13 @@
 services:
   mysql:
     image: mysql:8.0
-    container_name: inspection-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
@@ -28,7 +29,6 @@ services:
     build:
       context: ./backend
       dockerfile: ../docker/backend/Dockerfile
-    container_name: inspection-backend
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
@@ -42,18 +42,17 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    ports:
-      - "8080:8080"
+    # backend 不暴露端口给宿主机，仅允许 nginx 通过 docker network 访问
 
   nginx:
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile
-    container_name: inspection-nginx
     ports:
       - "80:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_started
 
 volumes:
   mysql_data:

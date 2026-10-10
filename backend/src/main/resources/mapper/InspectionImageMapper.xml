@@ -17,6 +17,10 @@
         VALUES (#{recordId}, #{imageUrl})
     </insert>
 
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM inspection_image WHERE id = #{id}
+    </select>
+
     <select id="selectByRecordId" resultMap="BaseResultMap">
         SELECT * FROM inspection_image
         WHERE record_id = #{recordId}

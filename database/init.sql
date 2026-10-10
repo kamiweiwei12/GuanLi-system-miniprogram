@@ -136,6 +136,21 @@ CREATE INDEX idx_image_record_id
     ON inspection_image (record_id);
 
 -- ============================================
+-- 操作日志表（Phase 14）
+-- ============================================
+CREATE TABLE IF NOT EXISTS sys_operation_log (
+    id              BIGINT          NOT NULL AUTO_INCREMENT  COMMENT '主键',
+    user_id         BIGINT          NOT NULL                COMMENT '操作用户 ID',
+    operation_type  VARCHAR(30)     NOT NULL                COMMENT '操作类型：LOGIN / UPDATE_ROLE / DELETE_RECORD',
+    target_desc     VARCHAR(200)    NULL                    COMMENT '操作描述',
+    ip              VARCHAR(50)     NULL                    COMMENT '客户端 IP',
+    created_at      DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
+    PRIMARY KEY (id),
+    INDEX idx_opl_user (user_id),
+    INDEX idx_opl_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志表';
+
+-- ============================================
 -- 预置管理员（Docker 首次启动自动创建）
 -- ============================================
 INSERT IGNORE INTO sys_department (id, dept_name, parent_id) VALUES (1, '管理部', 0);

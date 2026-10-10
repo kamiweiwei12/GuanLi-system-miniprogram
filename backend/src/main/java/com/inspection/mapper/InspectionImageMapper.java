@@ -11,6 +11,8 @@ import java.util.List;
 @Mapper
 public interface InspectionImageMapper {
 
+    InspectionImage selectById(Long id);
+
     int insert(InspectionImage image);
 
     List<InspectionImage> selectByRecordId(Long recordId);
