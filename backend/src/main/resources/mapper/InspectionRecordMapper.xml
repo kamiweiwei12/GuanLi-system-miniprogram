@@ -151,8 +151,17 @@
     <select id="countForStats" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="long">
         SELECT COUNT(*) FROM inspection_record
         WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
         <if test="department != null and department != ''">
             AND department = #{department}
+        </if>
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name = #{deviceName}
         </if>
         <if test="startDate != null">
             AND inspection_time >= #{startDate}
@@ -166,8 +175,17 @@
     <select id="countByResult" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="map">
         SELECT result, COUNT(*) as cnt FROM inspection_record
         WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
         <if test="department != null and department != ''">
             AND department = #{department}
+        </if>
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name = #{deviceName}
         </if>
         <if test="startDate != null">
             AND inspection_time >= #{startDate}
@@ -182,8 +200,17 @@
     <select id="countByDepartment" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="map">
         SELECT department, COUNT(*) as cnt FROM inspection_record
         WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
         <if test="department != null and department != ''">
             AND department = #{department}
+        </if>
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name = #{deviceName}
         </if>
         <if test="startDate != null">
             AND inspection_time >= #{startDate}
@@ -200,8 +227,17 @@
         SELECT DATE(inspection_time) as date, COUNT(*) as cnt
         FROM inspection_record
         WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
         <if test="department != null and department != ''">
             AND department = #{department}
+        </if>
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name = #{deviceName}
         </if>
         <if test="startDate != null">
             AND inspection_time >= #{startDate}
@@ -212,6 +248,88 @@
         GROUP BY DATE(inspection_time)
         ORDER BY date DESC
         LIMIT 30
+    </select>
+
+    <!-- 按区域+结果分组统计（用于区域异常率） -->
+    <select id="countByArea" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="map">
+        SELECT area, result, COUNT(*) as cnt
+        FROM inspection_record
+        WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name = #{deviceName}
+        </if>
+        <if test="startDate != null">
+            AND inspection_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND inspection_time &lt;= #{endDate}
+        </if>
+        GROUP BY area, result
+        ORDER BY area
+    </select>
+
+    <!-- 按设备+结果分组统计（用于设备故障/隐患率） -->
+    <select id="countByDevice" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="map">
+        SELECT device_name, result, COUNT(*) as cnt
+        FROM inspection_record
+        WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name = #{deviceName}
+        </if>
+        <if test="startDate != null">
+            AND inspection_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND inspection_time &lt;= #{endDate}
+        </if>
+        GROUP BY device_name, result
+        ORDER BY device_name
+    </select>
+
+    <!-- 按日期+结果分组统计（用于趋势图多线展示） -->
+    <select id="countByDateWithResult" parameterType="com.inspection.dto.StatisticsQueryDTO" resultType="map">
+        SELECT DATE(inspection_time) as date, result, COUNT(*) as cnt
+        FROM inspection_record
+        WHERE is_deleted = 0
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        <if test="area != null and area != ''">
+            AND area = #{area}
+        </if>
+        <if test="deviceName != null and deviceName != ''">
+            AND device_name = #{deviceName}
+        </if>
+        <if test="startDate != null">
+            AND inspection_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            AND inspection_time &lt;= #{endDate}
+        </if>
+        GROUP BY DATE(inspection_time), result
+        ORDER BY date DESC
+        LIMIT 90
     </select>
 
     <!-- 筛选选项：不重复区域（权限过滤） -->
@@ -238,6 +356,69 @@
             AND department = #{department}
         </if>
         ORDER BY device_name
+    </select>
+
+    <!-- ===== Dashboard 方法（Phase 14） ===== -->
+
+    <!-- 今日巡检总数（范围查询，保证 idx_record_inspection_time 索引有效） -->
+    <select id="countToday" resultType="long">
+        SELECT COUNT(*) FROM inspection_record
+        WHERE is_deleted = 0
+        AND inspection_time &gt;= #{todayStart}
+        AND inspection_time &lt;= #{todayEnd}
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+    </select>
+
+    <!-- 今日异常数（故障+隐患） -->
+    <select id="countTodayAnomalies" resultType="long">
+        SELECT COUNT(*) FROM inspection_record
+        WHERE is_deleted = 0
+        AND result IN (1, 2)
+        AND inspection_time &gt;= #{todayStart}
+        AND inspection_time &lt;= #{todayEnd}
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+    </select>
+
+    <!-- 最近故障记录 -->
+    <select id="selectRecentFaults" resultType="map">
+        SELECT id, device_name, area, description, inspection_time
+        FROM inspection_record
+        WHERE is_deleted = 0
+        AND result = 1
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        ORDER BY inspection_time DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 最近隐患记录 -->
+    <select id="selectRecentHiddens" resultType="map">
+        SELECT id, device_name, area, description, inspection_time
+        FROM inspection_record
+        WHERE is_deleted = 0
+        AND result = 2
+        <if test="userId != null">
+            AND user_id = #{userId}
+        </if>
+        <if test="department != null and department != ''">
+            AND department = #{department}
+        </if>
+        ORDER BY inspection_time DESC
+        LIMIT #{limit}
     </select>
 
 </mapper>

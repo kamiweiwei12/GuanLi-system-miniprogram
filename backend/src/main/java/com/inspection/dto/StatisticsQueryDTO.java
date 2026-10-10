@@ -3,7 +3,7 @@ package com.inspection.dto;
 import java.time.LocalDateTime;
 
 /**
- * 统计查询参数
+ * 统计查询参数（支持权限过滤 + 区域/设备/时间范围筛选）
  */
 public class StatisticsQueryDTO {
 
@@ -15,6 +15,15 @@ public class StatisticsQueryDTO {
 
     /** 部门过滤（Service 层根据权限自动填充，不从前端接收） */
     private String department;
+
+    /** 用户 ID 过滤（Service 层 EMPLOYEE 角色自动填充，不从前端接收） */
+    private Long userId;
+
+    /** 区域过滤（可选，前端传入） */
+    private String area;
+
+    /** 设备名称过滤（可选，前端传入） */
+    private String deviceName;
 
     public LocalDateTime getStartDate() {
         return startDate;
@@ -38,5 +47,29 @@ public class StatisticsQueryDTO {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
     }
 }

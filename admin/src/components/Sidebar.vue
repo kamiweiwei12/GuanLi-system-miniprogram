@@ -8,6 +8,7 @@
   >
     <el-menu-item index="/dashboard">Dashboard</el-menu-item>
     <el-menu-item index="/reports">巡检记录</el-menu-item>
+    <el-menu-item index="/statistics">统计分析</el-menu-item>
     <el-menu-item v-if="isAdmin" index="/users">用户管理</el-menu-item>
   </el-menu>
 </template>
