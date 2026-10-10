@@ -1,7 +1,7 @@
 {
-  "name": "miniprogram-ts-quickstart",
+  "name": "guanli-system-miniprogram",
   "version": "1.0.0",
-  "description": "",
+  "description": "企业巡检管理系统微信小程序",
   "scripts": {
   },
   "keywords": [],

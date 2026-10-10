@@ -1,221 +1,151 @@
-# 企业微信巡检系统（Inspection Demo）
+# 企业巡检管理系统
 
-## Docker 快速部署（推荐）
+面向企业设备巡检场景的一体化管理系统。员工可通过微信小程序上报巡检结果与现场图片，管理人员可在 Web 后台完成记录查询、权限管理、数据统计、Excel 导出，并生成日报、周报或月报所需的 AI 分析提示词。
+
+## 核心能力
+
+- 微信小程序：Token 登录、巡检上报、图片上传、记录列表与详情
+- 管理后台：巡检记录筛选、分页、详情查看、Excel 导出、用户与角色管理
+- 数据分析：总览、区域排行、设备风险、趋势图和当日异常看板
+- 权限隔离：系统管理员、部门管理员、普通员工三级数据权限
+- AI 报告准备：根据统计结果生成日报、周报、月报 Prompt（暂未接入外部大模型）
+- 运维能力：操作日志、健康检查、Docker Compose 一键部署
+
+## 系统架构
+
+```text
+微信小程序 ─┐
+            ├─ Nginx ─ Spring Boot REST API ─ MySQL 8
+Vue 3 后台 ─┘                 │
+                              └─ 本地图片存储 / AI Prompt
+```
+
+| 模块 | 技术栈 |
+|---|---|
+| 微信小程序 | 原生框架、TypeScript |
+| 管理后台 | Vue 3、Vite、TypeScript、Element Plus、ECharts |
+| 后端服务 | Java 21、Spring Boot 3、MyBatis |
+| 数据库 | MySQL 8 |
+| 部署 | Docker Compose、Nginx |
+
+## 快速开始
 
 ### 环境要求
 
-- Docker Desktop（含 Docker Compose）
+- Docker Desktop（包含 Docker Compose v2）
+- 建议至少 4 GB 可用内存
 
-### 三步启动
-
-```bash
-# 1. 创建环境变量文件
-copy docker\.env.example .env
-
-# 2. 编辑 .env 文件，设置 MySQL 密码
-# MYSQL_ROOT_PASSWORD=你的密码
-# MYSQL_USER=inspection
-# MYSQL_PASSWORD=你的密码
-# SPRING_DATASOURCE_USERNAME=inspection
-# SPRING_DATASOURCE_PASSWORD=你的密码
-
-# 3. 启动所有服务
-docker compose up -d
-```
-
-### 访问
-
-- 管理后台：http://localhost
-- 默认管理员 Token：`admin-setup-token`
-
-### Windows 一键启动
-
-双击 `start.bat`，自动检查 Docker 状态并启动所有服务。
-
-### 日常操作
+### 1. 配置环境变量
 
 ```bash
-docker compose up -d      # 启动
-docker compose down       # 停止（保留数据）
-docker compose down -v    # 停止并删除数据卷（⚠ 数据会丢失）
-docker compose logs -f    # 查看日志
+cp docker/.env.example .env
 ```
 
-### 常见问题
+编辑 `.env`，至少设置 `MYSQL_ROOT_PASSWORD`、`MYSQL_USER`、`MYSQL_PASSWORD`、`SPRING_DATASOURCE_USERNAME` 和 `SPRING_DATASOURCE_PASSWORD`。应用数据库用户名与密码应保持一致。
 
-| 问题 | 解决方案 |
-|------|----------|
-| 3306 端口被占用 | 停止本地 MySQL 服务，或修改 docker-compose.yml 中端口映射 |
-| Docker 未启动 | 先启动 Docker Desktop |
-| 首次构建慢 | 首次需下载镜像并编译，约 5-10 分钟 |
-| 页面访问 404 | 等待所有容器状态为 `Up` 后再访问 |
+Windows PowerShell 可使用：
 
----
+```powershell
+Copy-Item docker/.env.example .env
+```
 
-## 项目简介
+### 2. 启动服务
 
-一个企业内部巡检管理系统，支持：
+```bash
+docker compose up -d --build
+docker compose ps
+```
 
-- **普通员工**：通过微信小程序提交巡检记录（部门、姓名、区域、设备、图片、描述等）
-- **管理员**：通过 Web 后台查看、筛选、统计所有巡检记录
-- **AI 分析**：Python 脚本自动生成日报、月报、分析建议
+首次构建需要下载依赖，通常需要数分钟。所有服务启动后访问：
 
----
+- 管理后台：<http://localhost>
+- 健康检查：<http://localhost/api/v1/ping>
+- 初始管理员 Token：`admin-setup-token`
 
-## 项目背景
+> 初始 Token 仅用于本地部署和验收。对外部署前请替换默认凭据，并完善正式认证方案。
 
-传统巡检依赖纸质表单或 Excel 记录，存在以下痛点：
+### 3. 导入验收数据（可选）
 
-- 数据分散，难以汇总分析
-- 图片无法与记录关联
-- 无法实时查看巡检进度
-- 管理层缺乏数据驱动的决策依据
+```bash
+docker compose exec -T mysql mysql --default-character-set=utf8mb4 -u inspection -p inspection_db < database/test-data.sql
+```
 
-本系统通过"小程序录入 + Web 后台管理 + AI 自动分析"三层架构，解决上述问题。
+完整验收步骤见 [Phase 13 验收指南](docs/Phase13-验收指南.md)。
 
----
+### 常用命令
 
-## 项目目标
+```bash
+docker compose logs -f       # 查看日志
+docker compose restart       # 重启服务
+docker compose down          # 停止服务并保留数据卷
+```
 
-| 目标 | 说明 |
+## 本地开发
+
+### 后端
+
+```powershell
+cd backend
+.\mvnw.cmd spring-boot:run
+```
+
+开发配置请从 `backend/src/main/resources/application-dev.yml.example` 复制，并通过本地配置或环境变量填写敏感信息；不要提交真实密码。
+
+### 管理后台
+
+```bash
+cd admin
+npm install
+npm run dev
+```
+
+### 微信小程序
+
+使用微信开发者工具导入仓库根目录。`project.private.config.json` 仅保存本机配置，已被 Git 忽略。
+
+## 目录结构
+
+```text
+.
+├─ miniprogram/       微信小程序源码
+├─ admin/             Vue 3 管理后台
+├─ backend/           Spring Boot 后端
+├─ database/          初始化、测试与编码修复脚本
+├─ docker/            后端和 Nginx 镜像配置
+├─ docs/              架构、API、权限、部署与开发记录
+├─ typings/           小程序 TypeScript 类型定义
+├─ docker-compose.yml 服务编排
+├─ start.bat          Windows 启动脚本
+└─ stop.bat           Windows 停止脚本
+```
+
+## 权限模型
+
+| 角色 | 数据范围 | 主要能力 |
+|---|---|---|
+| `ADMIN` | 全部数据 | 用户管理、全局统计、记录查询与导出 |
+| `DEPT_ADMIN` | 本部门数据 | 部门统计、记录查询与导出 |
+| `EMPLOYEE` | 本人数据 | 巡检上报、查看本人记录与统计 |
+
+详细端点权限见 [权限矩阵](docs/权限矩阵.md)。权限由后端统一校验，前端菜单隐藏不作为安全边界。
+
+## 文档导航
+
+| 文档 | 内容 |
 |---|---|
-| ✔ 企业可维护 | 标准化目录结构、统一代码规范、完整文档 |
-| ✔ 企业可部署 | Docker 一键部署，环境隔离 |
-| ✔ 企业可交接 | README + 文档齐全，新人可快速上手 |
-| ✔ 企业可扩展 | 高内聚低耦合，模块独立可替换 |
-| ✔ 企业可运行 | 每一步都是可运行状态，不遗留"半成品"代码 |
+| [架构设计](docs/架构设计.md) | 系统分层与关键设计 |
+| [数据库设计](docs/数据库设计.md) | 表结构和字段说明 |
+| [API 文档](docs/API.md) | REST API 概览 |
+| [权限矩阵](docs/权限矩阵.md) | 角色与接口访问范围 |
+| [开发路线](docs/开发路线.md) | 阶段规划与完成状态 |
+| [开发日志](docs/开发日志.md) | 按阶段记录的实现过程 |
+| [新环境部署说明](docs/新环境部署与访问说明.md) | 部署、访问与排障 |
+| [Docker 注意事项](docs/Docker-部署注意事项.md) | Docker 与字符集问题 |
 
----
+## 当前状态与后续计划
 
-## 总体架构图
+当前版本已完成小程序上报、后台管理、统计分析、AI Prompt 生成和 Docker 部署闭环。后续计划包括企业微信通知、正式 JWT/SSO 认证、真实大模型接入、风险预测和数据大屏。
 
-```
-┌─────────────────────────────────────────────────┐
-│                    用户层                        │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-│  │ 微信小程序 │  │ Vue3 Web │  │ AI Agent │      │
-│  │ (员工端)  │  │ (管理端)  │  │ (分析端)  │      │
-│  └─────┬────┘  └────┬─────┘  └────┬─────┘      │
-│        │            │             │             │
-├────────┼────────────┼─────────────┼─────────────┤
-│        ▼            ▼             ▼             │
-│  ┌─────────────────────────────────────────┐    │
-│  │          RESTful API (Spring Boot)       │    │
-│  └─────────────────┬───────────────────────┘    │
-│                    │                             │
-│                    ▼                             │
-│  ┌─────────────────────────────────────────┐    │
-│  │              MySQL 8                     │    │
-│  └─────────────────────────────────────────┘    │
-│                  数据层                          │
-└─────────────────────────────────────────────────┘
-```
+## Git 规范
 
----
-
-## 项目目录结构
-
-```
-miniprogram-1/
-├── miniprogram/          # 微信小程序端（TypeScript）
-│   ├── app.json          #   小程序配置
-│   ├── app.ts            #   小程序入口
-│   ├── pages/            #   页面目录
-│   └── utils/            #   工具函数
-├── backend/              # Spring Boot 后端（Java 21）
-├── admin/                # Vue3 管理后台
-├── ai-analysis/          # Python AI 分析模块
-├── database/             # 数据库脚本
-├── docker/               # Docker 配置
-│   ├── .env.example      #   环境变量模板
-│   ├── backend/          #   Spring Boot Dockerfile + Maven 镜像
-│   └── nginx/            #   Nginx Dockerfile + 配置
-├── docker-compose.yml    # Docker Compose 编排
-├── start.bat             # Windows 一键启动
-├── stop.bat              # Windows 停止
-├── docs/                 # 项目文档
-│   ├── API.md            #   API 接口文档
-│   ├── 数据库设计.md      #   数据库表结构设计
-│   └── 架构设计.md        #   系统架构设计说明
-├── typings/              # TypeScript 类型定义
-├── .gitignore            # Git 忽略规则
-└── README.md             # 本文件
-```
-
----
-
-## 技术选型
-
-| 层级 | 技术 | 版本 |
-|---|---|---|
-| 后端框架 | Spring Boot | 3.x |
-| Java | JDK | 21 LTS |
-| 构建工具 | Maven | 3.9+ |
-| 数据库 | MySQL | 8.0+ |
-| 管理后台 | Vue 3 | 3.x |
-| 小程序 | 微信原生 + TypeScript | - |
-| AI 分析 | Python | 3.11+ |
-| 容器化 | Docker | - |
-
----
-
-## 开发规范
-
-### Git Commit 规范
-
-遵循 [Conventional Commits](https://www.conventionalcommits.org/)：
-
-```
-<type>: <description>
-
-feat:     新功能
-fix:      Bug 修复
-docs:     文档变更
-style:    代码格式（不影响功能）
-refactor: 重构（既非新功能也非 Bug 修复）
-test:     测试相关
-chore:    构建/工具/依赖变更
-```
-
-示例：
-
-```
-feat: 新增巡检记录提交接口 POST /report
-docs: 创建数据库设计文档
-chore: 项目初始化（目录结构 + Git 仓库 + .gitignore）
-```
-
-### 代码规范
-
-- **Java**：遵循阿里巴巴 Java 开发手册
-- **TypeScript**：`tsconfig.json` 已启用 strict 模式
-- **Python**：遵循 PEP 8
-
-### 分支策略
-
-- `master`：稳定版本，随时可部署
-- `dev`：开发分支
-- `feature/xxx`：功能分支
-
----
-
-## 开发路线（Roadmap）
-
-| 阶段 | 内容 | 状态 |
-|---|---|---|
-| 第一阶段 | 项目初始化（目录结构、Git、.gitignore、README、docs） | ✅ 已完成 |
-| 第二阶段 | 数据库设计（业务分析 → 表设计 → init.sql） | ✅ 已完成 |
-| 第三阶段 | Spring Boot 初始化（项目骨架、多环境配置、启动验证） | ✅ 已完成 |
-| 第四阶段 | 后端业务开发（Entity → Mapper → Service → Controller → 查询 + 图片上传） | ✅ 已完成 |
-| 第五阶段 | 微信小程序开发（巡检上报 + 列表 + 详情） | ✅ 已完成 |
-| 第六阶段 | Vue3 管理后台（列表、分页、筛选、统计图） | ✅ 已完成 |
-| 第七阶段 | AI 分析（Python 脚本、日报、月报、AI 建议） | ⬜ 待开始 |
-| 第八阶段 | Docker 部署（Dockerfile、docker-compose、启动脚本） | ✅ 已完成 |
-
----
-
-## 参与开发
-
-本项目遵循"最小变更 + 先计划再执行"的开发原则。
-
-每条 Commit 必须是独立、可运行、可回滚的最小单元。
+提交信息遵循 [Conventional Commits](https://www.conventionalcommits.org/)；`main` 保持可部署，功能开发建议使用 `feature/*` 分支。任何 `.env`、生产配置、密钥和本机私有配置都不得提交。

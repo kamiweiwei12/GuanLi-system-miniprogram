@@ -1,5 +1,5 @@
 {
-  "description": "项目配置文件",
+  "description": "企业巡检管理系统微信小程序",
   "miniprogramRoot": "miniprogram/",
   "compileType": "miniprogram",
   "setting": {
