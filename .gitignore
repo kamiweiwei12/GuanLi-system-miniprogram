@@ -49,7 +49,8 @@ application-prod.yml
 !application-dev.yml.example
 !application-prod.yml.example
 
-# 微信小程序私密配置
+# 微信小程序本地配置（从 project.config.example.json 复制）
+project.config.json
 project.private.config.json
 
 # ====================================

@@ -101,7 +101,13 @@ npm run dev
 
 ### 微信小程序
 
-使用微信开发者工具导入仓库根目录。`project.private.config.json` 仅保存本机配置，已被 Git 忽略。
+先创建本机项目配置：
+
+```powershell
+Copy-Item project.config.example.json project.config.json
+```
+
+在本地 `project.config.json` 中填写自己的微信小程序 App ID，再使用微信开发者工具导入仓库根目录。`project.config.json` 和 `project.private.config.json` 均已被 Git 忽略，禁止提交真实 App ID 或 AppSecret。
 
 ## 目录结构
 
